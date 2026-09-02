@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      # Unit tests only: the live suite hits the real API and is run manually.
+      - run: ruff check src tests scripts examples
+      - run: ruff format --check src tests scripts examples
+      - run: mypy
+      - run: pytest -m "not live"

@@ -1,0 +1,69 @@
+{
+  "items": [
+    {
+      "id": "m42672085293",
+      "name": "iPhone 15 128GBブラック",
+      "price": "70000",
+      "status": "on_sale",
+      "thumbnail": "https://static.mercdn.net/thumb/item/webp/m42672085293_1.jpg?1772023227",
+      "type": "ITEM_TYPE_MERCARI",
+      "auctionInfo": {
+        "id": "0",
+        "highestBid": "70000"
+      },
+      "isLiked": false,
+      "categoryId": "0",
+      "shippingMethodId": "0"
+    },
+    {
+      "id": "m65453535956",
+      "name": "Apple iPhone 16 128GB",
+      "price": "100000",
+      "status": "on_sale",
+      "thumbnail": "https://static.mercdn.net/thumb/item/webp/m65453535956_1.jpg?1788304979",
+      "type": "ITEM_TYPE_MERCARI",
+      "auctionInfo": null,
+      "isLiked": false,
+      "categoryId": "0",
+      "shippingMethodId": "0"
+    },
+    {
+      "id": "m13857213135",
+      "name": "iPhone13 Pro 128gb シエラブルー",
+      "price": "49999",
+      "status": "on_sale",
+      "thumbnail": "https://static.mercdn.net/thumb/item/webp/m13857213135_1.jpg?1788313816",
+      "type": "ITEM_TYPE_MERCARI",
+      "auctionInfo": null,
+      "isLiked": false,
+      "categoryId": "0",
+      "shippingMethodId": "0"
+    },
+    {
+      "id": "m11091718428",
+      "name": "iPhone 14 ミッドナイト 128GB",
+      "price": "55000",
+      "status": "on_sale",
+      "thumbnail": "https://static.mercdn.net/thumb/item/webp/m11091718428_1.jpg?1788323121",
+      "type": "ITEM_TYPE_MERCARI",
+      "auctionInfo": null,
+      "isLiked": false,
+      "categoryId": "0",
+      "shippingMethodId": "0"
+    },
+    {
+      "id": "m66522707598",
+      "name": "Apple iPhone13 128GB 本体",
+      "price": "40000",
+      "status": "on_sale",
+      "thumbnail": "https://static.mercdn.net/thumb/item/webp/m66522707598_1.jpg?1788316268",
+      "type": "ITEM_TYPE_MERCARI",
+      "auctionInfo": null,
+      "isLiked": false,
+      "categoryId": "0",
+      "shippingMethodId": "0"
+    }
+  ],
+  "ads": [],
+  "nextPageToken": "F_-BBAEBBkN1cnNvcgH_ggABDAH_gAAAE38DAQL_gAABAQEDVmFsARAAAABr_4IABARQYWdlAQVpbnQzMgQCAAIAEFRvdGFsUmV0dXJuZWRBZHMBBWludDMyBAIAAAASVG90YWxSZXR1cm5lZEl0ZW1zAQVpbnQzMgQCAAoADUNvbnN1bWVkSXRlbXMBBWludDMyBAIAAAA"
+}

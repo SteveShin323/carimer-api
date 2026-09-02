@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "nextPageToken": "v1:1",
+    "previousPageToken": "",
+    "numFound": "40",
+    "properties": []
+  },
+  "items": [
+    {
+      "id": "m83173230226",
+      "sellerId": "900000009",
+      "buyerId": "",
+      "status": "ITEM_STATUS_ON_SALE",
+      "name": "iPhone 15 本体　バッテリー92%",
+      "price": "62100",
+      "created": "1787874926",
+      "updated": "1788346759",
+      "thumbnails": [
+        "https://static.mercdn.net/thumb/item/webp/m83173230226_1.jpg?1787874926"
+      ],
+      "itemType": "ITEM_TYPE_MERCARI",
+      "itemConditionId": "4",
+      "shippingPayerId": "2",
+      "itemSizes": [],
+      "itemBrand": null,
+      "itemPromotions": [],
+      "shopName": "",
+      "itemSize": null,
+      "shippingMethodId": "17",
+      "categoryId": "859",
+      "isNoPrice": false,
+      "title": "",
+      "isLiked": false,
+      "photos": [
+        {
+          "uri": "https://static.mercdn.net/item/detail/webp/photos/m83173230226_1.jpg?1787874926"
+        }
+      ],
+      "auction": {
+        "id": "",
+        "bidDeadline": "2026-09-02T11:39:00Z",
+        "totalBid": "21",
+        "highestBid": "62100",
+        "initialPrice": "60000"
+      },
+      "shop": null,
+      "attributes": []
+    },
+    {
+      "id": "m20209421257",
+      "sellerId": "900000010",
+      "buyerId": "",
+      "status": "ITEM_STATUS_ON_SALE",
+      "name": "Apple iPhone 15 本体 ブラック",
+      "price": "60000",
+      "created": "1788344880",
+      "updated": "1788344881",
+      "thumbnails": [
+        "https://static.mercdn.net/thumb/item/webp/m20209421257_1.jpg?1788344880"
+      ],
+      "itemType": "ITEM_TYPE_MERCARI",
+      "itemConditionId": "2",
+      "shippingPayerId": "2",
+      "itemSizes": [],
+      "itemBrand": {
+        "id": "3272",
+        "name": "Apple",
+        "subName": "Apple"
+      },
+      "itemPromotions": [],
+      "shopName": "",
+      "itemSize": null,
+      "shippingMethodId": "14",
+      "categoryId": "859",
+      "isNoPrice": false,
+      "title": "",
+      "isLiked": false,
+      "photos": [
+        {
+          "uri": "https://static.mercdn.net/item/detail/webp/photos/m20209421257_1.jpg?1788344880"
+        }
+      ],
+      "auction": {
+        "id": "",
+        "bidDeadline": "2026-09-03T11:23:32Z",
+        "totalBid": "0",
+        "highestBid": "60000",
+        "initialPrice": "60000"
+      },
+      "shop": null,
+      "attributes": []
+    }
+  ],
+  "components": [
+    {
+      "rowNumber": "-1",
+      "querySuggest": {
+        "suggestFacets": {
+          "facets": [
+            {
+              "facetId": "1\u001fa2V5d29yZB9wcm8=",
+              "displayNamesMap": {
+                "ja": "pro"
+              },
+              "searchableValue": "pro",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB9wbHVz",
+              "displayNamesMap": {
+                "ja": "plus"
+              },
+              "searchableValue": "plus",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8yNTZnYg==",
+              "displayNamesMap": {
+                "ja": "256gb"
+              },
+              "searchableValue": "256gb",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8xMjhnYg==",
+              "displayNamesMap": {
+                "ja": "128gb"
+              },
+              "searchableValue": "128gb",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB/jgrHjg7zjgrk=",
+              "displayNamesMap": {
+                "ja": "ケース"
+              },
+              "searchableValue": "ケース",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8yNTY=",
+              "displayNamesMap": {
+                "ja": "256"
+              },
+              "searchableValue": "256",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB/mnKzkvZM=",
+              "displayNamesMap": {
+                "ja": "本体"
+              },
+              "searchableValue": "本体",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB9wcm9tYXg=",
+              "displayNamesMap": {
+                "ja": "promax"
+              },
+              "searchableValue": "promax",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB/jgrjjg6Pjg7Pjgq8=",
+              "displayNamesMap": {
+                "ja": "ジャンク"
+              },
+              "searchableValue": "ジャンク",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8xMjg=",
+              "displayNamesMap": {
+                "ja": "128"
+              },
+              "searchableValue": "128",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "rowNumber": "0",
+      "engagementArea": {
+        "empty": {}
+      }
+    },
+    {
+      "rowNumber": "7",
+      "suggestedItems": {
+        "searchRequest": {
+          "userId": "",
+          "pageSize": 20,
+          "pageToken": "",
+          "searchSessionId": "8b9867d4-5a5c-42c9-a619-b44dca2a85d4",
+          "indexRouting": "INDEX_ROUTING_UNSPECIFIED",
+          "thumbnailTypes": [],
+          "searchCondition": {
+            "keyword": "iphone 15",
+            "excludeKeyword": "",
+            "sort": "SORT_SCORE",
+            "order": "ORDER_DESC",
+            "status": [
+              "STATUS_ON_SALE"
+            ],
+            "sizeId": [],
+            "categoryId": [],
+            "brandId": [],
+            "sellerId": [],
+            "priceMin": 0,
+            "priceMax": 0,
+            "itemConditionId": [],
+            "shippingPayerId": [],
+            "shippingFromArea": [],
+            "shippingMethod": [],
+            "colorId": [],
+            "hasCoupon": false,
+            "createdAfterDate": "0",
+            "createdBeforeDate": "0",
+            "attributes": [],
+            "itemTypes": [],
+            "skuIds": [],
+            "shopIds": [],
+            "promotionValidAt": null,
+            "excludeShippingMethodIds": []
+          },
+          "searchType": "SEARCH_TYPE_MERCARI",
+          "defaultDatasets": [],
+          "serviceFrom": "",
+          "withItemSizes": true,
+          "withItemBrand": true,
+          "withItemPromotions": false,
+          "withShopname": true,
+          "withItemSize": false,
+          "useDynamicAttribute": false,
+          "withSuggestedItems": false,
+          "withProductSuggest": false,
+          "withOfferPricePromotion": true,
+          "disableEventLogging": false,
+          "trackTotalHits": 0,
+          "withSearchConditionId": false,
+          "searchConditionId": "",
+          "itemTitleType": "ITEM_TITLE_UNSPECIFIED",
+          "withIsLiked": false,
+          "withProductArticles": false,
+          "withParentProducts": false,
+          "withAuction": false,
+          "laplaceDeviceUuid": "",
+          "source": "",
+          "config": null
+        }
+      }
+    }
+  ],
+  "searchCondition": {
+    "keyword": "iphone 15",
+    "excludeKeyword": "",
+    "sort": "SORT_SCORE",
+    "order": "ORDER_DESC",
+    "status": [
+      "STATUS_ON_SALE"
+    ],
+    "sizeId": [],
+    "categoryId": [],
+    "brandId": [],
+    "sellerId": [],
+    "priceMin": 10000,
+    "priceMax": 80000,
+    "itemConditionId": [],
+    "shippingPayerId": [],
+    "shippingFromArea": [],
+    "shippingMethod": [],
+    "colorId": [],
+    "hasCoupon": false,
+    "createdAfterDate": "0",
+    "createdBeforeDate": "0",
+    "attributes": [
+      {
+        "id": "d664efe3-ae5a-4824-b729-e789bf93aba9",
+        "values": [
+          "3b6eac8c-7be5-4c9c-b537-7c05cd3c4905"
+        ],
+        "options": [
+          {
+            "id": "3b6eac8c-7be5-4c9c-b537-7c05cd3c4905",
+            "name": "一般拍賣"
+          }
+        ]
+      }
+    ],
+    "itemTypes": [],
+    "skuIds": [],
+    "shopIds": [],
+    "promotionValidAt": null,
+    "excludeShippingMethodIds": []
+  },
+  "searchConditionId": ""
+}

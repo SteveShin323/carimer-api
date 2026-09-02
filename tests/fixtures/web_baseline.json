@@ -1,0 +1,46 @@
+{
+  "captured_at": "2026-09-02",
+  "method": "Read by hand in a browser from the jp.mercari.com search page: the sidebar state and the result grid. These are counts of what the web UI rendered, not API output.",
+  "scenario": "acceptance scenario 1 (the full filter stack)",
+  "url": "https://jp.mercari.com/search?keyword=iphone%2015&price_min=10000&price_max=80000&item_condition_id=1,2&shipping_payer_id=2&sort=price&order=asc&7bd3eacc-ae45-4d73-bc57-a611c9432014=340258ac-e220-4722-8c35-7f73b7382831&d664efe3-ae5a-4824-b729-e789bf93aba9=B38F1DC9286E0B80812D9B19DB14298C1FF1116CA8332D9EE9061026635C9088",
+  "filters_shown_by_web_ui": [
+    "10000 ~ 80000",
+    "iphone",
+    "15",
+    "新品、未使用",
+    "未使用に近い",
+    "送料込み(出品者負担)",
+    "色：ブラック系",
+    "出品形式：通常出品"
+  ],
+  "web_result_count": 35,
+  "web_has_next_page": false,
+  "carimer_approx_total": 35,
+  "deviation": "0% (within the +/-50% acceptance band)",
+  "notes": [
+    "The web search page shows no total count (there is no result-count label), so the number above is a count of item-cell elements in the grid.",
+    "On the first paint the attribute parameters in the URL (colour, listing format) are reflected in the sidebar checkboxes and the chips but not in the results, which show the unfiltered page of 120 (117 rendered cells, cheapest 10,000 yen). A second request applies them and the grid becomes 35 items; toggling the on-sale checkbox reproduces this.",
+    "That filtered count of 35 matches approx_total of 35 from this package exactly.",
+    "The web sidebar had 16 sections including the seller-type one, while facets:suggest returned 15 without it at the same moment - see 01-api-spec.md section 4.6.",
+    "The listing-format options in the sidebar were: all, auction, standard listing. The earlier snapshot names 'regular auction' and '3-hour auction' are gone from the web too - see 01-api-spec.md section 4.5.",
+    "The colour list had 16 entries whose names and order match the snapshot in 02-filter-catalog.md section 3."
+  ],
+  "web_sidebar_sections": [
+    "カテゴリー",
+    "ブランド",
+    "サイズ",
+    "販売状況",
+    "出品者",
+    "商品の状態",
+    "価格",
+    "割引オプション",
+    "あんしん鑑定",
+    "出品形式",
+    "保証付き整備品",
+    "色",
+    "発送オプション",
+    "配送料の負担",
+    "タイムセール割引率",
+    "除外キーワード"
+  ]
+}

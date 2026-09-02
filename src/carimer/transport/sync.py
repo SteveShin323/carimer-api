@@ -1,0 +1,98 @@
+"""Blocking transport: ``httpx.Client`` + ``min_interval`` + retries."""
+
+from __future__ import annotations
+
+import time
+from types import TracebackType
+from typing import Any
+
+import httpx
+
+from carimer.transport import errors
+from carimer.transport.base import (
+    CALL_COUNTER,
+    Request,
+    TransportCore,
+    TransportOptions,
+    json_body,
+    retry_after_seconds,
+)
+
+__all__ = ["SyncTransport"]
+
+
+class SyncTransport(TransportCore):
+    """Sends :class:`Request` objects and returns parsed JSON.
+
+    Requests are spaced by at least ``min_interval`` seconds (monotonic clock, so a
+    system-clock change cannot collapse the gap).
+    """
+
+    def __init__(
+        self,
+        options: TransportOptions | None = None,
+        *,
+        client: httpx.Client | None = None,
+    ) -> None:
+        super().__init__(options)
+        self._owns_client = client is None
+        self._client = client or httpx.Client(
+            timeout=self.options.timeout,
+            proxy=self.options.proxy,
+            follow_redirects=True,
+        )
+        self._last_sent: float | None = None
+
+    def __enter__(self) -> SyncTransport:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
+        self.close()
+
+    def close(self) -> None:
+        if self._owns_client:
+            self._client.close()
+
+    def send(self, request: Request) -> dict[str, Any]:
+        attempt = 0
+        while True:
+            self._wait_for_slot()
+            try:
+                response = self._client.request(
+                    request.method,
+                    request.url,
+                    params=request.params,
+                    json=request.json,
+                    headers=self.headers_for(request),
+                )
+            except httpx.HTTPError as exc:
+                if attempt >= self.options.max_retries:
+                    raise errors.TransportError(f"{type(exc).__name__}: {exc}") from exc
+                time.sleep(self.backoff_delay(attempt))
+                attempt += 1
+                continue
+            CALL_COUNTER.record(str(response.request.url))
+            if response.status_code >= 400:
+                if self.should_retry(response.status_code, attempt):
+                    retry_after = retry_after_seconds(response)
+                    time.sleep(self.backoff_delay(attempt, retry_after))
+                    attempt += 1
+                    continue
+                raise self.error_for(response.status_code, dict(response.headers), response.content)
+            return json_body(response)
+
+    def _wait_for_slot(self) -> None:
+        interval = self.options.min_interval
+        if interval <= 0:
+            return
+        now = time.monotonic()
+        if self._last_sent is not None:
+            remaining = interval - (now - self._last_sent)
+            if remaining > 0:
+                time.sleep(remaining)
+        self._last_sent = time.monotonic()

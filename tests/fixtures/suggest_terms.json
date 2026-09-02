@@ -1,0 +1,120 @@
+{
+  "data": [
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone15",
+          "subtitle": "スマートフォン本体",
+          "search_params": {
+            "keyword": "iphone15",
+            "item_categories": [
+              {
+                "id": 859,
+                "name": "スマートフォン本体"
+              }
+            ]
+          },
+          "score": 0.043416437
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone 13",
+          "search_params": {
+            "keyword": "iphone 13"
+          },
+          "score": 0.043182105
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone17pro",
+          "search_params": {
+            "keyword": "iphone17pro"
+          },
+          "score": 0.04283055
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone17",
+          "search_params": {
+            "keyword": "iphone17"
+          },
+          "score": 0.042829476
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone",
+          "search_params": {
+            "keyword": "iphone"
+          },
+          "score": 0.03915421
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone17 本体",
+          "search_params": {
+            "keyword": "iphone17 本体"
+          }
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone7",
+          "search_params": {
+            "keyword": "iphone7"
+          }
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone15",
+          "search_params": {
+            "keyword": "iphone15"
+          }
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone17ケース",
+          "search_params": {
+            "keyword": "iphone17ケース"
+          }
+        }
+      }
+    },
+    {
+      "MixedQuery": {
+        "Query": {
+          "title": "iphone6",
+          "search_params": {
+            "keyword": "iphone6"
+          }
+        }
+      }
+    }
+  ],
+  "meta": {
+    "requested": 1788349825
+  },
+  "result": "OK"
+}

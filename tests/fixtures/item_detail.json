@@ -1,0 +1,418 @@
+{
+  "result": "OK",
+  "data": {
+    "id": "m87177707015",
+    "seller": {
+      "id": 900000001,
+      "name": "user-1",
+      "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+      "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg",
+      "register_sms_confirmation": "yes",
+      "register_sms_confirmation_at": "2020-10-06 17:28:11",
+      "region_code": "",
+      "created": 1601972891,
+      "num_sell_items": 24,
+      "ratings": {
+        "good": 75,
+        "normal": 0,
+        "bad": 0
+      },
+      "num_ratings": 75,
+      "score": 75,
+      "is_official": false,
+      "quick_shipper": false,
+      "is_followable": true,
+      "is_blocked": false,
+      "is_inactive": false,
+      "star_rating_score": 5
+    },
+    "buyer": {
+      "region_code": "",
+      "link": {
+        "title": "スマホ取引ガイド",
+        "url": "https://www.mercari.com/jp/guide/smartphone/"
+      }
+    },
+    "status": "on_sale",
+    "name": "【極美品】iPhone15 本体 ブルー 128GB",
+    "price": 70000,
+    "description": "商品説明（テスト用ダミー）",
+    "photos": [
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_1.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_2.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_3.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_4.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_5.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_6.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_7.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_8.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_9.jpg?1788341954",
+      "https://static.mercdn.net/item/detail/orig/photos/m87177707015_10.jpg?1788341954"
+    ],
+    "photo_paths": [
+      "photos/m87177707015_1.jpg",
+      "photos/m87177707015_2.jpg",
+      "photos/m87177707015_3.jpg",
+      "photos/m87177707015_4.jpg",
+      "photos/m87177707015_5.jpg",
+      "photos/m87177707015_6.jpg",
+      "photos/m87177707015_7.jpg",
+      "photos/m87177707015_8.jpg",
+      "photos/m87177707015_9.jpg",
+      "photos/m87177707015_10.jpg"
+    ],
+    "thumbnails": [
+      "https://static.mercdn.net/thumb/item/jpeg/m87177707015_1.jpg?1788341954"
+    ],
+    "item_category": {
+      "id": 859,
+      "name": "スマートフォン本体",
+      "display_order": 1,
+      "parent_category_id": 100,
+      "parent_category_name": "スマートフォン・携帯電話",
+      "root_category_id": 7,
+      "root_category_name": "スマホ・タブレット・パソコン",
+      "brand_group_id": 1
+    },
+    "item_category_ntiers": {
+      "id": 859,
+      "name": "スマートフォン本体",
+      "display_order": 1,
+      "parent_category_id": 100,
+      "parent_category_name": "スマートフォン・携帯電話",
+      "root_category_id": 7,
+      "root_category_name": "スマホ・タブレット・パソコン",
+      "brand_group_id": 1
+    },
+    "parent_categories_ntiers": [
+      {
+        "id": 7,
+        "name": "スマホ・タブレット・パソコン",
+        "display_order": 0
+      },
+      {
+        "id": 100,
+        "name": "スマートフォン・携帯電話",
+        "display_order": 0
+      }
+    ],
+    "item_condition": {
+      "id": 2,
+      "name": "未使用に近い",
+      "subname": "数回使用し、あまり使用感がない"
+    },
+    "item_brand": {
+      "id": 3272,
+      "name": "Apple",
+      "sub_name": "Apple"
+    },
+    "colors": [],
+    "shipping_payer": {
+      "id": 2,
+      "name": "送料込み(出品者負担)",
+      "code": "seller"
+    },
+    "shipping_method": {
+      "id": 14,
+      "name": "らくらくメルカリ便",
+      "is_deprecated": "no"
+    },
+    "shipping_from_area": {
+      "id": 99,
+      "name": "未定"
+    },
+    "shipping_duration": {
+      "id": 2,
+      "name": "2~3日で発送",
+      "min_days": 2,
+      "max_days": 3
+    },
+    "shipping_class": {
+      "id": 0,
+      "fee": 0,
+      "icon_id": 0,
+      "pickup_fee": 0,
+      "shipping_fee": 0,
+      "total_fee": 0,
+      "is_pickup": false
+    },
+    "num_likes": 29,
+    "num_comments": 4,
+    "registered_prices_count": 0,
+    "comments": [
+      {
+        "id": 95236264528996010,
+        "user": {
+          "id": 900000001,
+          "name": "user-1",
+          "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+          "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg",
+          "region_code": "JP"
+        },
+        "message": "取引メッセージ（テスト用ダミー）",
+        "created": 1788342232
+      },
+      {
+        "id": 3602690324155720497,
+        "user": {
+          "id": 900000001,
+          "name": "user-1",
+          "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+          "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg",
+          "region_code": "JP"
+        },
+        "message": "取引メッセージ（テスト用ダミー）",
+        "created": 1788342159
+      },
+      {
+        "id": 2448274366940134606,
+        "user": {
+          "id": 900000002,
+          "name": "user-2",
+          "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+          "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg",
+          "region_code": "JP"
+        },
+        "message": "取引メッセージ（テスト用ダミー）",
+        "created": 1788342140
+      },
+      {
+        "id": 436313405517990307,
+        "user": {
+          "id": 900000003,
+          "name": "user-3",
+          "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+          "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg",
+          "region_code": "JP"
+        },
+        "message": "取引メッセージ（テスト用ダミー）",
+        "created": 1788342111
+      }
+    ],
+    "updated": 1788342482,
+    "created": 1788341954,
+    "pager_id": 5785491845,
+    "liked": false,
+    "checksum": "0a8b0cce2758117fd32e21fad7e6d929",
+    "is_dynamic_shipping_fee": false,
+    "application_attributes": {},
+    "is_shop_item": "no",
+    "hash_tags": [],
+    "is_anonymous_shipping": true,
+    "is_web_visible": true,
+    "is_offerable": false,
+    "is_organizational_user": false,
+    "organizational_user_status": "",
+    "is_stock_item": false,
+    "is_cancelable": true,
+    "shipped_by_worker": false,
+    "additional_services": [],
+    "has_additional_service": false,
+    "has_like_list": false,
+    "is_offerable_v2": true,
+    "item_attributes": [
+      {
+        "id": "f7f186cc-a16e-474b-a7a9-ee179b5565c0",
+        "text": "photo_description",
+        "values": [
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          },
+          {
+            "id": "",
+            "text": ""
+          }
+        ],
+        "deep_facet_filterable": false,
+        "show_on_ui": false
+      },
+      {
+        "id": "7bd3eacc-ae45-4d73-bc57-a611c9432014",
+        "text": "色",
+        "values": [
+          {
+            "id": "27678b0c-32a1-4841-89ae-bc884616f66a",
+            "text": "ブルー系"
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": false
+      },
+      {
+        "id": "b6b9be89-648c-4af9-b3fe-1b77de4833d1",
+        "text": "ブランド",
+        "values": [
+          {
+            "id": "a3c76396-500f-48e0-ab0a-3a214947e2e4",
+            "text": "Apple"
+          }
+        ],
+        "deep_facet_filterable": false,
+        "show_on_ui": false
+      },
+      {
+        "id": "ce318123-cf86-48ed-b132-d3896ec9a23c",
+        "text": "シリーズ",
+        "values": [
+          {
+            "id": "9b36bbee-1abd-414d-8b20-a80a2745621b",
+            "text": "iPhone"
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": true
+      },
+      {
+        "id": "cc57d8a4-d67a-43c5-956c-4f46d1c3dcb2",
+        "text": "機種名",
+        "values": [
+          {
+            "id": "7572b3fd-8736-491a-af45-c40c444e6f61",
+            "text": "iPhone 15",
+            "preconditions": [
+              {
+                "id": "ce318123-cf86-48ed-b132-d3896ec9a23c",
+                "value": {
+                  "id": "9b36bbee-1abd-414d-8b20-a80a2745621b",
+                  "text": "iPhone"
+                }
+              }
+            ]
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": true
+      },
+      {
+        "id": "678ee689-1374-43ca-8e8d-994c53232bb2",
+        "text": "スマートフォン カラー",
+        "values": [
+          {
+            "id": "2018ced7-77a1-4b34-a7bb-b740fadfb025",
+            "text": "ブルー",
+            "preconditions": [
+              {
+                "id": "cc57d8a4-d67a-43c5-956c-4f46d1c3dcb2",
+                "value": {
+                  "id": "7572b3fd-8736-491a-af45-c40c444e6f61",
+                  "text": "iPhone 15"
+                }
+              },
+              {
+                "id": "ce318123-cf86-48ed-b132-d3896ec9a23c",
+                "value": {
+                  "id": "9b36bbee-1abd-414d-8b20-a80a2745621b",
+                  "text": "iPhone"
+                }
+              }
+            ]
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": true
+      },
+      {
+        "id": "16c2436d-8893-4e6d-ba7c-f137d200503e",
+        "text": "容量",
+        "values": [
+          {
+            "id": "ef8c7a05-5029-45de-910a-d1fb5ca40150",
+            "text": "128GB",
+            "preconditions": [
+              {
+                "id": "cc57d8a4-d67a-43c5-956c-4f46d1c3dcb2",
+                "value": {
+                  "id": "7572b3fd-8736-491a-af45-c40c444e6f61",
+                  "text": "iPhone 15"
+                }
+              },
+              {
+                "id": "ce318123-cf86-48ed-b132-d3896ec9a23c",
+                "value": {
+                  "id": "9b36bbee-1abd-414d-8b20-a80a2745621b",
+                  "text": "iPhone"
+                }
+              }
+            ]
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": true
+      },
+      {
+        "id": "56fcd98f-fa8c-433a-9db8-08357a2a91b9",
+        "text": "画面割れ",
+        "values": [
+          {
+            "id": "c5b8c2cd-55ad-408a-b847-fc30d34c85e7",
+            "text": "なし"
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": true
+      },
+      {
+        "id": "65d9027d-6a4a-4a9c-8492-b47269daa6c4",
+        "text": "機能不良",
+        "values": [
+          {
+            "id": "003798d3-8d6d-4df9-9607-fc91d6e53de4",
+            "text": "なし"
+          }
+        ],
+        "deep_facet_filterable": true,
+        "show_on_ui": true
+      }
+    ],
+    "is_dismissed": false,
+    "photo_descriptions": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "meta_title": "【極美品】iPhone15 本体 ブルー 128GB",
+    "meta_subtitle": "Apple・未使用に近い",
+    "is_degraded": false
+  },
+  "meta": {}
+}

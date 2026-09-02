@@ -1,0 +1,82 @@
+{
+  "result": "OK",
+  "data": [
+    {
+      "subject": "buyer",
+      "user": {
+        "id": 900000004,
+        "name": "user-4",
+        "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+        "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg"
+      },
+      "fame": "good",
+      "message": "取引メッセージ（テスト用ダミー）",
+      "created": 1787832535,
+      "pager_id": 1787832535
+    },
+    {
+      "subject": "buyer",
+      "user": {
+        "id": 900000005,
+        "name": "user-5",
+        "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+        "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg"
+      },
+      "fame": "good",
+      "message": "取引メッセージ（テスト用ダミー）",
+      "created": 1780395778,
+      "pager_id": 1780395778
+    },
+    {
+      "subject": "buyer",
+      "user": {
+        "id": 900000006,
+        "name": "user-6",
+        "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+        "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg"
+      },
+      "fame": "good",
+      "message": "取引メッセージ（テスト用ダミー）",
+      "created": 1775272737,
+      "pager_id": 1775272737
+    },
+    {
+      "subject": "buyer",
+      "user": {
+        "id": 900000007,
+        "name": "user-7",
+        "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+        "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg"
+      },
+      "fame": "good",
+      "message": "取引メッセージ（テスト用ダミー）",
+      "created": 1773366979,
+      "pager_id": 1773366979
+    },
+    {
+      "subject": "buyer",
+      "user": {
+        "id": 900000008,
+        "name": "user-8",
+        "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+        "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg"
+      },
+      "fame": "good",
+      "message": "取引メッセージ（テスト用ダミー）",
+      "created": 1772591908,
+      "pager_id": 1772591908
+    }
+  ],
+  "meta": {
+    "score": 75,
+    "ratings": {
+      "good": 75,
+      "normal": 0,
+      "bad": 0
+    },
+    "has_next": true,
+    "num_ratings": 75,
+    "star_rating_score": 5,
+    "requested": 1788349824
+  }
+}

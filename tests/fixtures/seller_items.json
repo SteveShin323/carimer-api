@@ -1,0 +1,62 @@
+{
+  "result": "OK",
+  "meta": {
+    "has_next": false
+  },
+  "data": [
+    {
+      "id": "m87177707015",
+      "seller": {
+        "id": 900000001,
+        "name": "user-9"
+      },
+      "status": "on_sale",
+      "name": "【極美品】iPhone15 本体 ブルー 128GB",
+      "price": 70000,
+      "thumbnails": [
+        "https://static.mercdn.net/thumb/item/jpeg/m87177707015_1.jpg?1788341954"
+      ],
+      "root_category_id": 0,
+      "num_likes": 0,
+      "num_comments": 0,
+      "created": 1788341954,
+      "updated": 1788342482,
+      "item_category": null,
+      "item_category_ntiers": {
+        "id": 859,
+        "name": "スマートフォン本体",
+        "parent_category_id": 100,
+        "parent_category_name": "スマートフォン・携帯電話",
+        "root_category_id": 7,
+        "root_category_name": "スマホ・タブレット・パソコン"
+      },
+      "parent_categories_ntiers": [
+        {
+          "id": 7,
+          "name": "スマホ・タブレット・パソコン"
+        },
+        {
+          "id": 100,
+          "name": "スマートフォン・携帯電話"
+        }
+      ],
+      "item_brand": {
+        "id": 3272,
+        "name": "Apple",
+        "sub_name": "Apple"
+      },
+      "shipping_from_area": {
+        "id": 99,
+        "name": "未定"
+      },
+      "shipping_method_id": 14,
+      "pager_id": 5785491845,
+      "liked": false,
+      "item_pv": 0,
+      "recent_item_pv": 0,
+      "is_no_price": false,
+      "is_archived": false,
+      "is_url_limited": false
+    }
+  ]
+}

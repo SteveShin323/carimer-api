@@ -1,0 +1,39 @@
+{
+  "result": "OK",
+  "data": {
+    "id": 900000001,
+    "name": "user-1",
+    "photo_url": "https://static.mercdn.net/members/resize/anonymized_1.jpg",
+    "photo_thumbnail_url": "https://static.mercdn.net/thumb/members/anonymized_1.jpg",
+    "register_sms_confirmation": "yes",
+    "ratings": {
+      "good": 75,
+      "normal": 0,
+      "bad": 0
+    },
+    "polarized_ratings": {
+      "good": 75,
+      "bad": 0
+    },
+    "num_ratings": 75,
+    "star_rating_score": 5,
+    "is_followable": true,
+    "is_following_requester": false,
+    "is_blocked": false,
+    "following_count": 2,
+    "follower_count": 0,
+    "score": 75,
+    "created": 1601972891,
+    "proper": false,
+    "introduction": "プロフィール文（テスト用ダミー）",
+    "is_official": false,
+    "num_sell_items": 24,
+    "hide_profile": false,
+    "is_verified_proxy": false,
+    "kyc_type": "",
+    "is_following": false,
+    "is_organizational_user": false,
+    "organizational_user_status": ""
+  },
+  "meta": {}
+}

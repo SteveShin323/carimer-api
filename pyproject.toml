@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "carimer"
+dynamic = ["version"]
+description = "Unofficial anonymous-scope client for the Mercari (JP) private API"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+keywords = ["mercari", "api", "scraping", "japan"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed",
+]
+dependencies = [
+  "httpx>=0.28",
+  "pydantic>=2.7",
+  "cryptography>=42",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-asyncio>=0.24",
+  "respx>=0.21",
+  "ruff>=0.6",
+  "mypy>=1.11",
+]
+
+[project.urls]
+Homepage = "https://github.com/SteveShin323/carimer-api"
+Issues = "https://github.com/SteveShin323/carimer-api/issues"
+Changelog = "https://github.com/SteveShin323/carimer-api/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "src/carimer/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/carimer"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/carimer/catalog/fallback_catalog.json" = "carimer/catalog/fallback_catalog.json"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "--strict-markers -q"
+markers = [
+  "live: hits the real api.mercari.jp (excluded by default)",
+  "smoke: minimal live sanity set (6 calls: 3 search, 1 facets, 1 item, 1 shops)",
+  "phase1: transport + DPoP",
+  "phase2: search core",
+  "phase3: facets / dynamic attributes / categories",
+  "phase4: item / seller / peripheral APIs",
+  "phase5: monitoring and convenience",
+  "phase6: health check and docs",
+  "scenario: the GOAL §6 acceptance scenarios",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF", "ASYNC"]
+ignore = ["RUF001", "RUF002", "RUF003", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+"docs/probes/*" = ["ALL"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "scripts"]
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+exclude = "docs/probes"
+
+[[tool.mypy.overrides]]
+module = "respx.*"
+ignore_missing_imports = true

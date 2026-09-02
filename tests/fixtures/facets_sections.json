@@ -1,0 +1,276 @@
+{
+  "suggestedFacetMap": {
+    "": {
+      "suggestFacets": {
+        "facets": [
+          {
+            "facetId": "1\u001fY2F0ZWdvcnlfaWQf",
+            "displayNamesMap": {
+              "ja": "カテゴリー"
+            },
+            "searchableValue": "category_id",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fYnJhbmRfaWQf",
+            "displayNamesMap": {
+              "ja": "ブランド"
+            },
+            "searchableValue": "brand_id",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fZjQyYWUzOTAtMDRmZi00NmVhLTgwOGItZjVkOTdjYjQ1ZGI0Hw==",
+            "displayNamesMap": {
+              "ja": "サイズ"
+            },
+            "searchableValue": "f42ae390-04ff-46ea-808b-f5d97cb45db4",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fc3RhdHVzHw==",
+            "displayNamesMap": {
+              "ja": "販売状況"
+            },
+            "searchableValue": "status",
+            "leaf": false,
+            "selected": true,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001faXRlbV90eXBlcx8=",
+            "displayNamesMap": {
+              "ja": "出品者"
+            },
+            "searchableValue": "item_types",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001faXRlbV9jb25kaXRpb25faWQf",
+            "displayNamesMap": {
+              "ja": "商品の状態"
+            },
+            "searchableValue": "item_condition_id",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fcHJpY2Uf",
+            "displayNamesMap": {
+              "ja": "価格"
+            },
+            "searchableValue": "price",
+            "leaf": true,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fNDcyOTVkODAtNTgzOS00MjM3LWJiZmMtZGViNDRiNGU3OTk5Hw==",
+            "displayNamesMap": {
+              "ja": "割引オプション"
+            },
+            "searchableValue": "47295d80-5839-4237-bbfc-deb44b4e7999",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fZTZjZWM0MDQtNWIzNC00NmFhLTgzMTYtY2RhNjY5NWE4NWYzHw==",
+            "displayNamesMap": {
+              "ja": "あんしん鑑定"
+            },
+            "searchableValue": "e6cec404-5b34-46aa-8316-cda6695a85f3",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fZDY2NGVmZTMtYWU1YS00ODI0LWI3MjktZTc4OWJmOTNhYmE5Hw==",
+            "displayNamesMap": {
+              "ja": "出品形式"
+            },
+            "searchableValue": "d664efe3-ae5a-4824-b729-e789bf93aba9",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fODhkZGVhNGQtMGM1ZS00MTE3LTgxZTktMDJjMDg0OGNiYWI0Hw==",
+            "displayNamesMap": {
+              "ja": "保証付き整備品"
+            },
+            "searchableValue": "88ddea4d-0c5e-4117-81e9-02c0848cbab4",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fN2JkM2VhY2MtYWU0NS00ZDczLWJjNTctYTYxMWM5NDMyMDE0Hw==",
+            "displayNamesMap": {
+              "ja": "色"
+            },
+            "searchableValue": "7bd3eacc-ae45-4d73-bc57-a611c9432014",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fc2hpcHBpbmdfbWV0aG9kX2lkHw==",
+            "displayNamesMap": {
+              "ja": "発送オプション"
+            },
+            "searchableValue": "shipping_method_id",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fc2hpcHBpbmdfcGF5ZXJfaWQf",
+            "displayNamesMap": {
+              "ja": "配送料の負担"
+            },
+            "searchableValue": "shipping_payer_id",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fMDE1YzYzZDgtZTNlYy00YTY2LWIxYjEtMDMwYzI3OGFkN2NjHw==",
+            "displayNamesMap": {
+              "ja": "タイムセール割引率"
+            },
+            "searchableValue": "015c63d8-e3ec-4a66-b1b1-030c278ad7cc",
+            "leaf": false,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          },
+          {
+            "facetId": "1\u001fZXhjbHVkZV9rZXl3b3JkHw==",
+            "displayNamesMap": {
+              "ja": "除外キーワード"
+            },
+            "searchableValue": "exclude_keyword",
+            "leaf": true,
+            "selected": false,
+            "metadata": null,
+            "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+            "parentPath": null,
+            "nestedFacets": null,
+            "searchableKey": ""
+          }
+        ],
+        "nextPageToken": ""
+      },
+      "selectedPaths": {
+        "1\u001fc3RhdHVzHw==": {
+          "facetsCollection": [
+            {
+              "facets": [
+                {
+                  "facetId": "1\u001fc3RhdHVzHw==",
+                  "displayNamesMap": {
+                    "ja": "販売状況"
+                  },
+                  "searchableValue": "status",
+                  "leaf": false,
+                  "selected": true,
+                  "metadata": null,
+                  "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+                  "parentPath": null,
+                  "nestedFacets": null,
+                  "searchableKey": ""
+                },
+                {
+                  "facetId": "1\u001fc3RhdHVzH29uX3NhbGU=",
+                  "displayNamesMap": {
+                    "ja": "販売中"
+                  },
+                  "searchableValue": "on_sale",
+                  "leaf": true,
+                  "selected": true,
+                  "metadata": null,
+                  "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+                  "parentPath": null,
+                  "nestedFacets": null,
+                  "searchableKey": ""
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "relevantFacets": {
+        "facets": []
+      }
+    }
+  }
+}

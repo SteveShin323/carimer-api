@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "nextPageToken": "v1:1",
+    "previousPageToken": "",
+    "numFound": "2472",
+    "properties": []
+  },
+  "items": [
+    {
+      "id": "m87177707015",
+      "sellerId": "900000001",
+      "buyerId": "",
+      "status": "ITEM_STATUS_ON_SALE",
+      "name": "【極美品】iPhone15 本体 ブルー 128GB",
+      "price": "70000",
+      "created": "1788341954",
+      "updated": "1788342482",
+      "thumbnails": [
+        "https://static.mercdn.net/thumb/item/webp/m87177707015_1.jpg?1788341954"
+      ],
+      "itemType": "ITEM_TYPE_MERCARI",
+      "itemConditionId": "2",
+      "shippingPayerId": "2",
+      "itemSizes": [],
+      "itemBrand": {
+        "id": "3272",
+        "name": "Apple",
+        "subName": "Apple"
+      },
+      "itemPromotions": [],
+      "shopName": "",
+      "itemSize": null,
+      "shippingMethodId": "14",
+      "categoryId": "859",
+      "isNoPrice": false,
+      "title": "",
+      "isLiked": false,
+      "photos": [
+        {
+          "uri": "https://static.mercdn.net/item/detail/webp/photos/m87177707015_1.jpg?1788341954"
+        }
+      ],
+      "auction": null,
+      "shop": null,
+      "attributes": []
+    },
+    {
+      "id": "2JVoP4vefPkskNLnvGbb9P",
+      "sellerId": "0",
+      "buyerId": "",
+      "status": "ITEM_STATUS_ON_SALE",
+      "name": "【15日保証】 Apple iPhone 15 256GB SIMフリー　A3089 動作確認済み 即発送　送料無料",
+      "price": "62000",
+      "created": "1787541672",
+      "updated": "1788001649",
+      "thumbnails": [
+        "https://assets.mercari-shops-static.com/-/small/plain/2JVoNgSPnNouCm6TTzagrG.png@webp"
+      ],
+      "itemType": "ITEM_TYPE_BEYOND",
+      "itemConditionId": "4",
+      "shippingPayerId": "0",
+      "itemSizes": [],
+      "itemBrand": {
+        "id": "3272",
+        "name": "Apple",
+        "subName": "Apple"
+      },
+      "itemPromotions": [],
+      "shopName": "RXINデジタル店",
+      "itemSize": null,
+      "shippingMethodId": "0",
+      "categoryId": "859",
+      "isNoPrice": false,
+      "title": "",
+      "isLiked": false,
+      "photos": [
+        {
+          "uri": "https://assets.mercari-shops-static.com/-/large/plain/2JVoNgSPnNouCm6TTzagrG.png@webp"
+        }
+      ],
+      "auction": null,
+      "shop": {
+        "id": "2JSYvWiZp28KSWmERj2nxL"
+      },
+      "attributes": []
+    }
+  ],
+  "components": [
+    {
+      "rowNumber": "-1",
+      "querySuggest": {
+        "suggestFacets": {
+          "facets": [
+            {
+              "facetId": "1\u001fa2V5d29yZB9wcm8=",
+              "displayNamesMap": {
+                "ja": "pro"
+              },
+              "searchableValue": "pro",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB9wbHVz",
+              "displayNamesMap": {
+                "ja": "plus"
+              },
+              "searchableValue": "plus",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8yNTZnYg==",
+              "displayNamesMap": {
+                "ja": "256gb"
+              },
+              "searchableValue": "256gb",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8xMjhnYg==",
+              "displayNamesMap": {
+                "ja": "128gb"
+              },
+              "searchableValue": "128gb",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB/jgrHjg7zjgrk=",
+              "displayNamesMap": {
+                "ja": "ケース"
+              },
+              "searchableValue": "ケース",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8yNTY=",
+              "displayNamesMap": {
+                "ja": "256"
+              },
+              "searchableValue": "256",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB/mnKzkvZM=",
+              "displayNamesMap": {
+                "ja": "本体"
+              },
+              "searchableValue": "本体",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB9wcm9tYXg=",
+              "displayNamesMap": {
+                "ja": "promax"
+              },
+              "searchableValue": "promax",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB/jgrjjg6Pjg7Pjgq8=",
+              "displayNamesMap": {
+                "ja": "ジャンク"
+              },
+              "searchableValue": "ジャンク",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            },
+            {
+              "facetId": "1\u001fa2V5d29yZB8xMjg=",
+              "displayNamesMap": {
+                "ja": "128"
+              },
+              "searchableValue": "128",
+              "leaf": true,
+              "selected": false,
+              "metadata": null,
+              "selectedState": "FACET_SELECTED_STATE_UNSPECIFIED",
+              "parentPath": null,
+              "nestedFacets": null,
+              "searchableKey": "keyword"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "rowNumber": "0",
+      "engagementArea": {
+        "empty": {}
+      }
+    }
+  ],
+  "searchCondition": {
+    "keyword": "iphone 15",
+    "excludeKeyword": "",
+    "sort": "SORT_SCORE",
+    "order": "ORDER_DESC",
+    "status": [
+      "STATUS_ON_SALE"
+    ],
+    "sizeId": [],
+    "categoryId": [],
+    "brandId": [],
+    "sellerId": [],
+    "priceMin": 10000,
+    "priceMax": 80000,
+    "itemConditionId": [],
+    "shippingPayerId": [],
+    "shippingFromArea": [],
+    "shippingMethod": [],
+    "colorId": [],
+    "hasCoupon": false,
+    "createdAfterDate": "0",
+    "createdBeforeDate": "0",
+    "attributes": [],
+    "itemTypes": [],
+    "skuIds": [],
+    "shopIds": [],
+    "promotionValidAt": null,
+    "excludeShippingMethodIds": []
+  },
+  "searchConditionId": ""
+}
