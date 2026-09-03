@@ -14,7 +14,7 @@ truth for **public API names**.
    are the enums the API has fixed (sort, status, seller type, shipping option, item
    condition, who pays shipping) plus the seven dynamic attribute **section** ids. The
    value UUIDs from `02-filter-catalog.md` live in `fallback_catalog.json` and are used
-   offline and in tests only.
+   only when the live lookup fails, with a warning.
 3. **Parse leniently, keep the original.** Models require three fields (`id`, `name`,
    `price`); everything else is optional. Every model keeps the untouched payload in
    `raw`. Stringified numbers are cast in the parser.
@@ -86,7 +86,7 @@ tests/
 - `transport/base.py`
   - Options: `user_agent`, `device_uuid` (shared by `laplaceDeviceUuid` and the DPoP
     `uuid` claim), `rotate_every: int = 0`, `min_interval: float = 0.5`,
-    `proxy: str | None`, `timeout`, `max_retries=3`.
+    `proxy: str | None`, `timeout`, `max_retries=3`, and `max_retry_after=3600`.
   - The five default headers: `DPoP`, `X-Platform: web`,
     `Accept: application/json, text/plain, */*`, `Accept-Language: ja`, and
     `Content-Type: application/json` for POST. Per-request headers are applied last, which
@@ -95,11 +95,13 @@ tests/
     `rotate_session()` replaces it.
   - Response-to-exception mapping is the pure function
     `errors.from_response(status, headers, body)`.
-- `sync.py` / `asyncio.py`: sending, `min_interval` (monotonic clock plus sleep in the sync
-  transport, an `asyncio.Lock` in the async one, which also pins concurrency at 1), and
-  retries with exponential backoff from 0.5 s to 8 s on 429, 5xx and network errors,
-  honouring `Retry-After`. Other 4xx are not retried. 403 fails immediately as
-  `BlockedError`.
+- `sync.py` / `asyncio.py`: sending, `min_interval`, and concurrency 1. A `threading.Lock`
+  or `asyncio.Lock` surrounds each complete send attempt and guards the monotonic pacing
+  clock. Retries use exponential backoff from 0.5 s to 8 s on 429, 5xx and network errors.
+  A valid numeric or HTTP-date `Retry-After` is honoured as given rather than clamped to
+  the exponential ceiling. If it exceeds the separate `max_retry_after` limit, the
+  response error is raised instead of retrying early. Other 4xx are not retried. 403 fails
+  immediately as `BlockedError`.
 
 ### 3.2 errors
 
@@ -189,13 +191,17 @@ q = (SearchQuery("iphone 15")
 ### 3.5 search.attributes
 
 - `AttributeSection` (enum): `COLOR, SIZE, DISCOUNT, APPRAISAL, LISTING_FORMAT,
-  REFURBISHED, TIME_SALE` mapped to the section UUIDs of 02 §1. These seven are the only
-  attribute constants in code; the health check detects a change.
+  REFURBISHED, TIME_SALE` mapped to the section UUIDs of 02 §1. These seven section IDs and
+  the shared no-match fallback are the only attribute constants in code; the health check
+  detects a section change.
 - `AttributeResolver(facets_client, fallback)` with
   `resolve(section, *display_names_ja) -> AttributeFilter`. Value names must match
   `displayNamesMap.ja` **exactly** — there is no alias table, because a near miss would
-  silently filter on the wrong value. Order: in-memory cache, then `facets:suggest`, then
-  the fallback JSON (with a warning), then `UnknownFacetValue`.
+  silently filter on the wrong value. Order: in-memory cache, then `facets:suggest`; the
+  fallback JSON is considered only when that lookup fails, with a warning. A successful
+  lookup that does not contain the requested name raises `UnknownFacetValue`. The shared
+  no-match value follows the same live-first rule and is validated against its requested
+  section before its built-in fallback is used.
 - Sizes: `sizes(group_name_ja, *names)` resolves the group UUID and then the leaf UUIDs,
   and serialises as `attributes`.
 
@@ -222,19 +228,27 @@ The async twins are `aiter_pages` and `aiter_items` with the same signatures.
 
 ```python
 def watch_new_listings(client, query, *, on_new, interval=60, since=None,
-                       include_shops=False, max_cycles=None) -> int
+                       include_shops=False, max_cycles=None,
+                       max_pages_per_cycle=50) -> int
 ```
 
 `awatch_new_listings` is the async twin, and `on_new` may be a coroutine function there.
 
+- The watcher overrides the query sort with `SORT_CREATED_TIME DESC`, making its first
+  page the best available newest-first view. It does not rely on that page being strictly
+  ordered.
 - First cycle: when `since is None`, the ids on the current first page seed `seen_ids` and
   `since = max(created)`, **with no callback**.
 - Every cycle after that: narrow server-side with `query.created_after(since - 60)` (a
-  one-minute overlap), **re-filter client-side on `created > since`**, drop ids already in
-  `seen_ids`, sort by `created` descending, then call back. `since` advances to the largest
-  `created` seen. `created_after(ts)` serialises `ts + 32400` because the server reads the
-  value as JST (01 §3.2). The client-side re-filter is the safeguard that keeps a change in
-  server behaviour from producing false positives.
+  one-minute overlap), walk the entire window with `iter_pages` or `aiter_pages` up to
+  `max_pages_per_cycle`, **re-filter client-side on `created > since`**, de-duplicate and
+  sort by `created` descending, then call back. The watermark advances to the largest
+  `created` only after the complete window was processed. If the page cap truncates the
+  walk, the watermark stays unchanged and a possible-gap warning is logged.
+- `seen_ids` retains creation times and is pruned against `since - 60`, bounding memory to
+  the overlap window. `created_after(ts)` serialises `ts + 32400` because the server reads
+  the value as JST (01 §3.2). The client-side re-filter is the safeguard that keeps a
+  change in server behaviour from producing false positives.
 - `item_types` defaults to MERCARI. Shops products are opt-in because their `created`
   moves like an update timestamp (01 §3.3).
 
@@ -276,7 +290,8 @@ class AsyncClient:
     async def seller_badges(user_id) -> list[Badge]
     async def is_identity_verified(user_id) -> bool
     async def desired_price_info(item_id) -> DesiredPriceInfo
-    async def watch_new_listings(query, *, on_new, interval=60, since=None, max_cycles=None) -> int
+    async def watch_new_listings(query, *, on_new, interval=60, since=None, max_cycles=None,
+                                 max_pages_per_cycle=50) -> int
     async def master(name) -> dict                                                    # routing per §3.3
 ```
 
@@ -308,9 +323,11 @@ class AsyncClient:
 
 - Unit tests mock HTTP with `respx`. Fixtures are real responses with third-party personal
   data replaced by dummies. The body builders are tested for key-set equality against the
-  01 §3.1 capture.
+  01 §3.1 capture. Plain `pytest` deselects the `live` marker through project `addopts`, so
+  unit tests are the safe default.
 - Live tests use `-m live` plus a phase marker. Budget: ≤20 calls per phase, ≤70 in total
-  including the acceptance scenarios, ≥0.5 s between requests. The smoke set
+  including the acceptance scenarios, ≥0.5 s between requests. An explicit `-m` on the
+  command line replaces the default marker expression. The smoke set
   (`-m "live and smoke"`) is 6 calls: three searches (the baseline page, the total used by
   the section check, and the detail targets), one facets root, one item detail and one
   Shops detail.
@@ -321,15 +338,15 @@ class AsyncClient:
   retry on 403.
 - `scripts/health_check.py` separates required checks (search, detail, profile, the
   required facet sections, the `createdAfterDate` JST correction) from optional ones
-  (colour list, Shops detail, auction parsing, badges, desired price). An optional check
-  reports `skipped` when the live data offers no target. Output is JSON plus markdown, and
-  a required failure exits 1.
+  (colour list, Shops detail, auction parsing, the regular-listing filter excluding
+  auctions, badges, desired price). An optional check reports `skipped` when the live data
+  offers no target. Output is JSON plus markdown, and a required failure exits 1.
 
 ## 6. Operational and legal notes
 
 - This is an unofficial API. The README states the terms-of-service risk and the chance of
-  being blocked. The defaults are a 0.5 s gap and concurrency 1 (enforced by the transport
-  lock).
+  being blocked. The defaults are a 0.5 s gap and concurrency 1, enforced by both transport
+  locks.
 - Personal profile fields are never stored. DPoP tokens and full bodies are kept out of the
   logs; headers are masked even at debug level.
 - Attribute UUID and category changes are detected by the health check, which compares the

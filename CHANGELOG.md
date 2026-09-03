@@ -3,6 +3,45 @@
 This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] — 2026-09-03
+
+### Added
+
+- The watcher accepts `max_pages_per_cycle` and reports a possible gap when a polling
+  window exceeds that limit.
+- `TransportOptions.max_retry_after` provides a separate, generous ceiling for server
+  retry delays. The default is one hour.
+- The live health report includes an optional check that the regular-listing facet returns
+  no auctions.
+
+### Changed
+
+- Plain `pytest` now excludes live tests. Explicit marker expressions such as `-m live`
+  still select the live suite.
+- New-listing watches use created-time descending order, exhaust each overlap window up to
+  the per-cycle cap, advance their watermark only after a complete walk, and retain seen
+  IDs only for the active overlap window.
+- Attribute display names, including the shared no-match values, are resolved from the
+  requested live facet section before any fallback is considered.
+- Valid numeric and HTTP-date `Retry-After` values are honored as given. A delay above
+  `max_retry_after` raises the mapped response error rather than retrying early.
+
+### Fixed
+
+- Prevented default test runs from contacting the live Mercari API.
+- Prevented listings beyond the first polling page from being skipped permanently.
+- Enforced concurrency 1 when a synchronous client is shared across threads.
+- Prevented a display name from silently producing a filter for the wrong attribute
+  section.
+
+### Known limitations
+
+- The private API and its live facet values can change without notice.
+- Created-time search order is not strictly ordered; the watcher reduces this risk by
+  walking the overlap window, but a window larger than `max_pages_per_cycle` is reported as
+  a possible gap.
+- Anything requiring a login remains out of scope.
+
 ## [0.1.1] — 2026-09-02
 
 ### Changed

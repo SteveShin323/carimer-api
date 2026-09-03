@@ -17,9 +17,9 @@ both fetched from `facets:suggest` at runtime.
 - **Using it may violate Mercari's terms of service.** That judgement, and the
   responsibility, are yours. Check the terms and the applicable law before commercial use,
   bulk collection or redistribution.
-- **You can get blocked.** Cloudflare sits in front of the API. The defaults are one
-  request every 0.5 s with concurrency 1, and a 403 is treated as a block and never
-  retried. Lowering those defaults is not recommended.
+- **You can get blocked.** Cloudflare sits in front of the API. Both transports serialize
+  requests at concurrency 1 and keep a 0.5 s minimum gap by default. A 403 is treated as a
+  block and never retried. Lowering those defaults is not recommended.
 - Anything that needs a login — likes, comments, purchases, offers, saved searches — is
   **out of scope**.
 - The twelve personal fields in the seller profile response (`email`, `phone_number`,
@@ -120,19 +120,26 @@ query.attributes(AttributeFilter("d664efe3-ae5a-4824-b729-e789bf93aba9", ("3b6ea
   pages of the same query, and depends on the sort index. Do not compute a page count from
   it — walk with `iter_pages(max_pages=...)`. When the walk stops at the cap, the last page
   is flagged `truncated=True`.
-- **Do not use `SORT_CREATED_TIME` to detect new listings.** It is not strictly ordered
-  (39 of 120 adjacent pairs were inverted). Use `created_after(ts)` or
-  `watch_new_listings()`. The server reads that value as JST, so the package adds 32,400
-  seconds on the wire and re-checks each item client-side.
+- **Do not use one `SORT_CREATED_TIME` page to detect new listings.** It is not strictly
+  ordered (39 of 120 adjacent pairs were inverted). `watch_new_listings()` combines that
+  sort with an overlapping `created_after(ts)` window and walks every page in the window,
+  up to `max_pages_per_cycle=50`. It advances its watermark only after a complete walk;
+  hitting the cap keeps the previous watermark and logs a possible-gap warning. Retained
+  IDs are pruned with the overlap window. The server reads the time value as JST, so the
+  package adds 32,400 seconds on the wire and re-checks each item client-side.
 - **`items/get` returns 400 for Shops products** (`ITEM_TYPE_BEYOND`). `get_detail()`
   routes on the id shape and on `kind` before sending; passing a Shops id to `get_item()`
   raises `ShopsItemError` without a request.
 - **Attribute display names and the section list change.** Values are fetched from
   `facets:suggest` at runtime and only fall back to the bundled snapshot
-  (`fallback_catalog.json`), with a warning, when the live lookup fails. Refresh the
-  snapshot with `scripts/refresh_fallback_catalog.py`.
+  (`fallback_catalog.json`), with a warning, when the live lookup fails. A name missing
+  from a successful lookup raises `UnknownFacetValue`, which also prevents a display name
+  from being used with the wrong section. Refresh the snapshot with
+  `scripts/refresh_fallback_catalog.py`.
 - A 403 is treated as a block and fails immediately. Only 429, 5xx and network errors are
-  retried.
+  retried. Numeric and HTTP-date `Retry-After` values are honored independently of the
+  exponential-backoff ceiling. Values above the separate `max_retry_after=3600` default
+  fail immediately instead of retrying before the server requested.
 
 ## Health check
 
@@ -142,10 +149,11 @@ python scripts/health_check.py --markdown     # exits 1 if a required check fail
 
 Required checks (search, detail, profile, the required filter sections, the
 `createdAfterDate` JST correction) are separated from optional ones (colour list, Shops
-detail, auction parsing, badges, desired price), and the difference against the bundled
-snapshot is reported. [`.github/workflows/api-health.yml`](.github/workflows/api-health.yml)
-runs it every six hours and opens an `api-health` issue on failure, commenting on the
-existing one if there is one.
+detail, auction parsing, the regular-listing filter excluding auctions, badges, desired
+price), and the difference against the bundled snapshot is reported.
+[`.github/workflows/api-health.yml`](.github/workflows/api-health.yml) runs it every six
+hours and opens an `api-health` issue on failure, commenting on the existing one if there
+is one.
 
 **The cron only runs on the remote repository.** In a local clone the workflow never fires,
 so either run the command above yourself, or trigger `API health` once from the Actions tab
@@ -154,14 +162,16 @@ via *Run workflow*.
 ## Tests
 
 ```bash
+pytest                          # unit tests by default; live tests are deselected
 make test                        # unit tests (respx mocks, no live calls)
 pytest -m "live and smoke"       # live smoke set, 6 calls
 pytest -m "live and phase3"      # one phase of the live suite
 pytest -m "live and scenario"    # the acceptance scenarios
 ```
 
-Live tests hit the real API. They are paced at 0.6 s and budgeted at ≤20 calls per phase
-and ≤70 in total; every live session prints the actual count.
+Live tests hit the real API. An explicit `-m live` expression overrides the safe default,
+so the live targets continue to work. They are paced at 0.6 s and budgeted at ≤20 calls
+per phase and ≤70 in total; every live session prints the actual count.
 
 ## Documentation
 
