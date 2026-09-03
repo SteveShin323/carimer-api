@@ -3,6 +3,65 @@
 This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] — 2026-09-03
+
+A survey of what `jp.mercari.com` does anonymously turned up three endpoint families the
+package had no equivalent for, and one place where it was quietly losing data. Everything
+below was verified against the live API before it was written
+(`docs/probes/probe13*.py`–`probe21_fixtures.py`).
+
+### Fixed
+
+- **`seller_badges()` was dropping the seller-level badge.** The call omitted
+  `fetch_seller_rank_badge`, so `出品者レベルN` (badge id `10100`) never came back and a
+  seller whose only badge is that one looked like it had none. Measured across two
+  sellers and four request bodies: the flag is what matters, the `userId`/`user_id`
+  spelling does not.
+- **The DPoP `uuid` claim was never sent unless the caller set `device_uuid`.** The
+  architecture has always said one value feeds both `laplaceDeviceUuid` and the claim;
+  the transport passed the raw option instead of the resolved uuid, so the default
+  configuration signed without a claim. Search does not care, but other endpoints answer
+  200 with empty arrays rather than failing.
+- `health_check.py`'s `seller_badges` check never called `seller_badges()` — only
+  `is_identity_verified()`. It now calls both and reports the badge count, which is what
+  would have surfaced the bug above.
+
+### Added
+
+- **Search by image** — `search_by_image()`, `iter_image_pages()`, `iter_image_items()`
+  over `POST /v2/entities:imageSearch`, with `ImageSearchPage`, `CategorySuggestion` and
+  `Sort.SIMILARITY`. Accepts bytes or a filesystem path. The picture is uploaded once and
+  later pages quote the returned `image_id`.
+- **Mercari Shops storefronts** — `client.shops`: `details()`, `products()` /
+  `iter_products()` with the web's three `ShopProductOrder` values, `reviews()` /
+  `iter_reviews()`, and `batch_products()` for several products in one call. New models
+  `ShopDetail`, `ShopsProductSummary` and `ShopReview`. `SearchQuery.shops()` could
+  already filter by a storefront; now one can be read.
+- **The product page's recommendation shelves** — `related_component()` and
+  `iter_related_items()` over `relateditems/component` and `relateditems/loadmore`, with
+  `RelatedComponent` and the five accepted `RelatedComponentType` values. `similar_items()`
+  is one recommendation axis; there are four more.
+- `suggest_keywords(category_id=…)`, which scopes autocomplete the way the web search box
+  does — it replaces the result set rather than filtering it.
+- `get_shops_product(image_type=…)`, the Shops counterpart of `thumbnail_type`.
+- `iter_seller_items(exclude_archived=…)`, which the request builder already supported but
+  the client did not expose.
+- `services/master/v1/shippingFromAreas` as a known master dataset: the prefecture names
+  behind `SearchQuery.shipping_from()`, which has no web UI to read them from.
+- `SearchQuery.sort(Sort.SIMILARITY)` warns that the value belongs to `search_by_image()`
+  rather than falling under the generic "not one of the five combinations" message.
+- Optional health checks for image search, the Shops storefront, and which recommendation
+  component types the server still accepts.
+
+### Changed
+
+- `ShopsProduct.id` is normalised from all three spellings of the API's `name` field, so
+  an id from a storefront listing can be passed straight to `get_detail()`.
+- `docs/01-api-spec.md` gains §8.4 (recommendation shelves), §10 (image search) and §11
+  (Shops storefronts). The five endpoints it listed as "called by the web item page but
+  not investigated" are resolved — two of them, `products:search` and
+  `campaigns/component:get`, fail in the browser too and are documented as dead.
+
 ## [0.1.2] — 2026-09-03
 
 ### Added

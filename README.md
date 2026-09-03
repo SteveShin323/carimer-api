@@ -8,6 +8,10 @@ colour, discount, authentication, listing format, refurbished and time sale — 
 existing open-source wrappers do not, along with category-tree navigation and brand lookup,
 both fetched from `facets:suggest` at runtime.
 
+It also covers the parts of the web app that are not the search box: **search by image**,
+**Mercari Shops storefronts** (products, storefront record, reviews) and the product
+page's **recommendation shelves**.
+
 ## ⚠️ Before you use this
 
 - **This is an unofficial, private API.** Mercari does not publish or document it, and it
@@ -70,6 +74,32 @@ with Client() as client:
 Runnable examples: [`examples/quickstart.py`](examples/quickstart.py),
 [`examples/watch_new_listings.py`](examples/watch_new_listings.py),
 [`examples/seller_report.py`](examples/seller_report.py).
+
+## Beyond the search box
+
+```python
+from carimer import RelatedComponentType, SearchQuery, ShopProductOrder
+
+# Search by picture — the camera button in the web search box. Bytes or a path.
+page = client.search_by_image("shoes.jpg", SearchQuery().price(0, 5_000))
+print(page.category_suggestions)                    # what the backend thinks it is
+for item in client.iter_image_items("shoes.jpg", max_items=100):
+    ...                                             # the picture is uploaded once
+
+# A Mercari Shops storefront: `.shops()` could filter by one, now you can read one
+detail = client.shops.details(shop_id)              # name, rating, follower count, policies
+for product in client.shops.iter_products(shop_id, order_by=ShopProductOrder.PRICE_ASC):
+    full = client.get_detail(product.id)            # ids are normalised for this
+for review in client.shops.iter_reviews(shop_id, max_items=50):
+    ...
+client.shops.batch_products(ids)                    # several products in one call
+
+# The product page's recommendation shelves — `similar_items` is only one of them
+shelf = client.related_component(item.id, RelatedComponentType.SIMILAR_LOOKS)
+print(shelf.title)                                  # 見た目が近い商品
+for similar in client.iter_related_items(item.id, max_items=50):
+    ...
+```
 
 The async client has the same names. There is deliberately no sync facade that drives an
 event loop.
@@ -136,6 +166,22 @@ query.attributes(AttributeFilter("d664efe3-ae5a-4824-b729-e789bf93aba9", ("3b6ea
   from a successful lookup raises `UnknownFacetValue`, which also prevents a display name
   from being used with the wrong section. Refresh the snapshot with
   `scripts/refresh_fallback_catalog.py`.
+- **The DPoP `uuid` claim is not optional.** `TransportOptions.device_uuid` feeds both
+  `laplaceDeviceUuid` and the token's `uuid` claim, and when it is left unset the
+  transport generates one so both still get a value. Endpoints outside search tolerate a
+  missing claim; some answer 200 with empty arrays instead of failing, which is why the
+  wrapper always sends one (`docs/01-api-spec.md` §1.2).
+- **Image search pages differently.** `entities:imageSearch` puts its token at the top
+  level, reports no total at all, and page two quotes the `image_id` page one returned
+  instead of re-uploading the picture. `iter_image_pages()` does that; `iter_pages()`
+  cannot, so the two walks are separate.
+- **A Shops storefront listing sorts three ways and filters none.** `order_by` takes the
+  web's own values (`NEWEST`, `PRICE_ASC`, `PRICE_DESC`); anything else is ignored by the
+  server without an error. The `filter` parameter is sent empty because no value was ever
+  observed to do anything.
+- **`seller_badges()` sends `fetch_seller_rank_badge`.** Without it the seller-level badge
+  (`出品者レベルN`) is missing, and a seller whose only badge is that one looks like it has
+  none. This was wrong before 0.2.0.
 - A 403 is treated as a block and fails immediately. Only 429, 5xx and network errors are
   retried. Numeric and HTTP-date `Retry-After` values are honored independently of the
   exponential-backoff ceiling. Values above the separate `max_retry_after=3600` default
@@ -150,7 +196,14 @@ python scripts/health_check.py --markdown     # exits 1 if a required check fail
 Required checks (search, detail, profile, the required filter sections, the
 `createdAfterDate` JST correction) are separated from optional ones (colour list, Shops
 detail, auction parsing, the regular-listing filter excluding auctions, badges, desired
-price), and the difference against the bundled snapshot is reported.
+price, image search, the Shops storefront, and which recommendation component types the
+server still accepts), and the difference against the bundled snapshot is reported.
+
+The optional checks report rather than assert wherever the live data is allowed to vary:
+`seller_badges` passes on the call succeeding and puts the badge count in the detail line,
+and `related_components` reports the accepted/rejected split as a diff. Both are places
+where asserting a specific result would make the cron flaky — and where reporting nothing
+is how the missing badge flag stayed hidden.
 [`.github/workflows/api-health.yml`](.github/workflows/api-health.yml) runs it every six
 hours and opens an `api-health` issue on failure, commenting on the existing one if there
 is one.

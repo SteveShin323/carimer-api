@@ -39,22 +39,24 @@ src/carimer/
     sync.py / asyncio.py # httpx.Client / httpx.AsyncClient wrappers, retries, min_interval
     errors.py            # exception hierarchy
   api/                   # per-endpoint request builders returning Request(method, url, params, json, headers). No I/O
-    search.py            # entities:search and facets:suggest bodies, facetId encoding
-    items.py             # items/get, shops products, relateditems, desiredPrice
+    search.py            # entities:search, entities:imageSearch and facets:suggest bodies, facetId encoding
+    items.py             # items/get, shops products (single and batch), relateditems, desiredPrice
+    shops.py             # services/bff/shops/v1/* — storefront products, details, reviews
     users.py             # get_profile, get_items, reviews, usersocialjp
     master.py            # services/master/v1/*, master/v2/datasets/*
     suggest.py           # search_index/terms
   models/                # pydantic models plus dict-to-model parsers (no I/O)
     common.py            # RawModel (keeps raw), timestamp and numeric-string helpers
-    enums.py             # Sort, Order, Status, ItemType, ShippingMethod, Condition, ShippingPayer, ThumbnailType
-    search.py            # SearchItem, SearchPage, Auction, QuerySuggestChip
+    enums.py             # Sort, Order, Status, ItemType, ShippingMethod, Condition, ShippingPayer, ThumbnailType, RelatedComponentType, ShopProductOrder
+    search.py            # SearchItem, SearchPage, ImageSearchPage, CategorySuggestion, Auction, QuerySuggestChip
     item.py              # Item, ItemAttribute, EmbeddedSeller, ConvertedPrice
-    shops.py             # Shop, ShopsProduct, ShopsVariant
+    shops.py             # Shop, ShopsProduct, ShopsProductSummary, ShopDetail, ShopReview, ShopsVariant
     profile.py           # Profile (personal fields excluded), SellerItem, Review, Badge
     facets.py            # Facet, FacetSection, CategoryNode, Brand, Size, SizeGroup
-    misc.py              # SimilarItem, Suggestion, DesiredPriceInfo
+    misc.py              # SimilarItem, RelatedComponent, Suggestion, DesiredPriceInfo
   search/
     query.py             # SearchQuery (immutable builder) to a searchCondition dict, with type coercion
+    image.py             # bytes / path to the base64 photoBinary
     attributes.py        # AttributeSection, AttributeFilter, AttributeResolver (display name to UUID)
     paginate.py          # iter_pages / iter_items, sync and async
     pager.py             # max_pager_id paging for the legacy seller endpoints
@@ -65,6 +67,7 @@ src/carimer/
     cache.py             # in-memory TTL cache plus an optional disk layer
     fallback.py          # bundled snapshot loader
     fallback_catalog.json
+  storefront.py          # ShopsClient / AsyncShopsClient, reached as client.shops
   client.py              # Client / AsyncClient
 scripts/
   health_check.py
@@ -85,7 +88,9 @@ tests/
   each **left-zero-padded to 32 bytes**.
 - `transport/base.py`
   - Options: `user_agent`, `device_uuid` (shared by `laplaceDeviceUuid` and the DPoP
-    `uuid` claim), `rotate_every: int = 0`, `min_interval: float = 0.5`,
+    `uuid` claim — when it is left `None` the transport generates one and **both** get
+    that resolved value, because the feed endpoints treat a missing claim as no session,
+    01 §1.2), `rotate_every: int = 0`, `min_interval: float = 0.5`,
     `proxy: str | None`, `timeout`, `max_retries=3`, and `max_retry_after=3600`.
   - The five default headers: `DPoP`, `X-Platform: web`,
     `Accept: application/json, text/plain, */*`, `Accept-Language: ja`, and
@@ -276,24 +281,48 @@ class AsyncClient:
     facets: AsyncFacetsClient
     categories: AsyncCategories
     attributes: AsyncAttributeResolver
+    shops: AsyncShopsClient
     async def search(query: SearchQuery | str, *, page_token="", page_size=120) -> SearchPage
     def iter_pages(query, *, max_pages=50) -> AsyncIterator[SearchPage]
     def iter_items(query, *, max_items=None, max_pages=50) -> AsyncIterator[SearchItem]
+    async def search_by_image(image: bytes | str | PathLike, query=None, *, page_size=30) -> ImageSearchPage
+    def iter_image_pages(image, query=None, *, max_pages=50, page_size=30) -> AsyncIterator[ImageSearchPage]
+    def iter_image_items(image, query=None, *, max_items=None, max_pages=50) -> AsyncIterator[SearchItem]
     async def get_item(item_id, *, country_code: str | None = None) -> Item          # a Shops id raises ShopsItemError before sending
-    async def get_shops_product(product_id) -> ShopsProduct
+    async def get_shops_product(product_id, *, image_type: ThumbnailType | None = None) -> ShopsProduct
     async def get_detail(ref: SearchItem | str) -> Item | ShopsProduct                # routes on kind, or on the id shape
     async def get_profile(user_id) -> Profile
-    def iter_seller_items(seller_id, *, status=("on_sale",), max_pages=None) -> AsyncIterator[SellerItem]
+    def iter_seller_items(seller_id, *, status=("on_sale",), max_pages=None, exclude_archived=False) -> AsyncIterator[SellerItem]
     def iter_reviews(user_id, *, max_items=None) -> AsyncIterator[Review]
     async def similar_items(item_id, *, limit=15) -> list[SimilarItem]
-    async def suggest_keywords(text) -> list[Suggestion]
+    async def related_component(item_id, component_type=CLOSE_MATCH, *, page_size=10,
+                                view_request_id=None) -> RelatedComponent
+    def iter_related_items(item_id, component_type=CLOSE_MATCH_FEED, *, max_items=None,
+                           max_pages=50, page_size=10) -> AsyncIterator[SimilarItem]
+    async def suggest_keywords(text, *, category_id: int | None = None) -> list[Suggestion]
     async def seller_badges(user_id) -> list[Badge]
     async def is_identity_verified(user_id) -> bool
     async def desired_price_info(item_id) -> DesiredPriceInfo
     async def watch_new_listings(query, *, on_new, interval=60, since=None, max_cycles=None,
                                  max_pages_per_cycle=50) -> int
     async def master(name) -> dict                                                    # routing per §3.3
+
+
+class AsyncShopsClient:                          # client.shops — 01 §11
+    async def details(shop_id) -> ShopDetail
+    async def products(shop_id, *, page_token="", page_size=100,
+                       order_by=ShopProductOrder.NEWEST) -> tuple[list[ShopsProductSummary], str]
+    def iter_products(shop_id, *, max_items=None, max_pages=50, page_size=100,
+                      order_by=ShopProductOrder.NEWEST) -> AsyncIterator[ShopsProductSummary]
+    async def reviews(shop_id, *, page_token="", page_size=20) -> tuple[list[ShopReview], str]
+    def iter_reviews(shop_id, *, max_items=None, max_pages=50) -> AsyncIterator[ShopReview]
+    async def batch_products(product_ids: Sequence[str]) -> list[ShopsProduct]
 ```
+
+Image search is a walk of its own rather than a mode of `iter_pages`: this endpoint puts
+its token at the top level, reports no total, and page two has to quote the `image_id`
+page one returned, so it does not fit the `search(query, page_token, page_size)` protocol
+the search iterators are written against (01 §10).
 
 `Client` is the blocking version with the same names, returning `Iterator`.
 
@@ -306,7 +335,12 @@ class AsyncClient:
 | `QuerySuggestChip` | `label, keyword` | `components[].querySuggest` |
 | `Auction` | `auction_id, bid_deadline, total_bids, highest_bid, initial_price, state, auction_type` — one model for both the search shape (camelCase, ISO) and the detail shape (snake_case, unix) | |
 | `Item` | the detail fields plus `category_path: list[CategoryNode]`, `attributes: list[ItemAttribute]`, `auction`, `converted_price`, `seller: EmbeddedSeller` | 01 §5 |
-| `ShopsProduct` | `id, display_name, price, tags, sold_out, thumbnail, photos, description, shop, created/updated, variants, raw` | 01 §6 |
+| `ShopsProduct` | `id, display_name, price, tags, sold_out, thumbnail, photos, description, shop, created/updated, variants, raw`. `id` is normalised from all three `name` spellings (bare, `products/{id}`, `marketplaces/shops/products/{id}`) so it can go straight into `get_detail()` | 01 §6, §11.4 |
+| `ShopsProductSummary` | `id, display_name, price, in_stock, thumbnails, created/updated, category_id` — the storefront listing row, which is not a thinner `ShopsProduct` | 01 §11.1 |
+| `ShopDetail` | `id, name, description, thumbnail, status, score, review_count, followed_count, badges, created/updated, policies` | 01 §11.2 |
+| `ShopReview` | `id, rating, is_good, comment, product_id, product_name, shop_id, account_id, created/updated` | 01 §11.3 |
+| `ImageSearchPage` | `items, next_page_token, truncated, image_id, image_url, category_suggestions, search_condition_echo` — no `approx_total`, because the endpoint reports none, which is why `truncated` matters more here than on `SearchPage` | 01 §10 |
+| `RelatedComponent` | `title, component_type, data_type, items: list[SimilarItem], load_more_token` | 01 §8.4 |
 | `Profile` | respects the exclusion list of 01 §7.1, in the model and in `raw` | |
 | `SellerItem`, `Review`, `Badge`, `SimilarItem`, `Suggestion`, `DesiredPriceInfo` | | 01 §7-8 |
 | `Facet`, `FacetSection`, `CategoryNode`, `Brand`, `Size`, `SizeGroup` | | 01 §4, §9 |
