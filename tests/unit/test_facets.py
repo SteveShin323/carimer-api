@@ -195,14 +195,40 @@ def test_attr_merges_values_of_one_section_into_a_single_entry() -> None:
     assert condition["attributes"] == [{"id": COLOR, "values": ["340258ac", "a167b2a8"]}]
 
 
-def test_no_match_names_resolve_without_a_lookup() -> None:
-    """通常商品 / 通常出品 / 利用不可 share one hash and need no facets call (02 §4)."""
-    with respx.mock(assert_all_called=False) as mock:
-        route = mock.post(FACETS_URL)
-        resolver = AttributeResolver(None)
-        for name in ("通常商品", "通常出品", "利用不可"):
-            assert resolver.resolve(COLOR, name).values == (NO_MATCH_VALUE,)
-    assert route.call_count == 0
+def test_no_match_name_is_resolved_from_live_facets_first() -> None:
+    section = AttributeSection.LISTING_FORMAT.value
+    facet_id = encode_facet_id(section, "")
+    with respx.mock as mock:
+        route = mock.post(FACETS_URL).mock(
+            return_value=_facets_response(facet_id, [_facet("通常出品", NO_MATCH_VALUE)])
+        )
+        with SyncTransport(FAST) as transport:
+            resolver = AttributeResolver(FacetsClient(transport), fallback_value_map())
+            resolved = resolver.resolve(section, "通常出品")
+    assert route.call_count == 1
+    assert resolved.values == (NO_MATCH_VALUE,)
+
+
+def test_no_match_name_must_belong_to_the_requested_section() -> None:
+    facet_id = encode_facet_id(COLOR, "")
+    with respx.mock as mock:
+        route = mock.post(FACETS_URL).mock(
+            return_value=_facets_response(facet_id, [_facet("ブラック系", "340258ac")])
+        )
+        with SyncTransport(FAST) as transport:
+            resolver = AttributeResolver(FacetsClient(transport), fallback_value_map())
+            with pytest.raises(UnknownFacetValue, match="通常出品"):
+                resolver.resolve(COLOR, "通常出品")
+    assert route.call_count == 1
+
+
+def test_no_match_name_uses_validated_constant_when_live_lookup_fails() -> None:
+    resolver = AttributeResolver(None)
+    section = AttributeSection.LISTING_FORMAT.value
+
+    assert resolver.resolve(section, "通常出品").values == (NO_MATCH_VALUE,)
+    with pytest.raises(UnknownFacetValue, match="通常出品"):
+        resolver.resolve(COLOR, "通常出品")
 
 
 def test_falls_back_to_the_snapshot_when_the_lookup_fails(caplog: Any) -> None:
@@ -340,6 +366,27 @@ async def test_async_client_resolves_named_attributes_before_serialising() -> No
             await client.search(SearchQuery("x").attr(AttributeSection.COLOR, "ブラック系"))
     body = json.loads(search.calls[0].request.content)
     assert body["searchCondition"]["attributes"] == [{"id": COLOR, "values": ["340258ac"]}]
+
+
+async def test_async_no_match_name_is_resolved_from_live_facets_first() -> None:
+    from carimer import AsyncClient
+    from carimer.api.search import SEARCH_URL
+
+    section = AttributeSection.LISTING_FORMAT.value
+    facet_id = encode_facet_id(section, "")
+    with respx.mock as mock:
+        facet_route = mock.post(FACETS_URL).mock(
+            return_value=_facets_response(facet_id, [_facet("通常出品", NO_MATCH_VALUE)])
+        )
+        search_route = mock.post(SEARCH_URL).mock(
+            return_value=httpx.Response(200, json={"meta": {"numFound": "0"}, "items": []})
+        )
+        async with AsyncClient(options=FAST) as client:
+            await client.search(SearchQuery("x").attr(AttributeSection.LISTING_FORMAT, "通常出品"))
+
+    body = json.loads(search_route.calls[0].request.content)
+    assert facet_route.call_count == 1
+    assert body["searchCondition"]["attributes"] == [{"id": section, "values": [NO_MATCH_VALUE]}]
 
 
 def test_transport_error_is_not_swallowed_when_no_fallback_exists() -> None:

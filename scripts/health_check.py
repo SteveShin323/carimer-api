@@ -13,7 +13,7 @@ failure. Otherwise one Mercari sidebar change turns the cron permanently red.
 Usage:
     python scripts/health_check.py [--json out.json] [--markdown] [--quiet]
 
-Calls: 10-12.
+Calls: 11-13.
 """
 
 from __future__ import annotations
@@ -60,6 +60,7 @@ class HealthCheck:
         self._colors()
         self._shops_detail(page)
         self._auction_parsing()
+        self._regular_listing_filter()
         self._created_after_offset()
         self._badges(page)
         self._desired_price(page)
@@ -202,6 +203,22 @@ class HealthCheck:
             parsed = [i for i in page.items if i.auction and i.auction.bid_deadline]
             check.status = "pass" if len(parsed) == len(page.items) else "fail"
             check.detail = f"{len(parsed)}/{len(page.items)} auctions parsed"
+        except Exception as exc:
+            check.status, check.detail = "fail", _describe(exc)
+
+    def _regular_listing_filter(self) -> None:
+        check = Check("regular_listing_filter", required=False)
+        self.checks.append(check)
+        try:
+            page = self.client.search(
+                BASE_QUERY.attr(AttributeSection.LISTING_FORMAT, "通常出品"), page_size=20
+            )
+            if not page.items:
+                check.status, check.detail = "skipped", "no regular listings returned"
+                return
+            auctions = [item.id for item in page.items if item.auction]
+            check.status = "pass" if not auctions else "fail"
+            check.detail = f"{len(page.items)} items, auctions={len(auctions)}"
         except Exception as exc:
             check.status, check.detail = "fail", _describe(exc)
 

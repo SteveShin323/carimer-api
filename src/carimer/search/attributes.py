@@ -38,6 +38,17 @@ _log = logging.getLogger(__name__)
 #: The shared "none of the above" value used by 通常商品 / 通常出品 / 利用不可 (02 §4).
 NO_MATCH_VALUE = "B38F1DC9286E0B80812D9B19DB14298C1FF1116CA8332D9EE9061026635C9088"
 
+_NO_MATCH_SECTIONS: dict[str, frozenset[str]] = {
+    "通常商品": frozenset(
+        {
+            "47295d80-5839-4237-bbfc-deb44b4e7999",
+            "88ddea4d-0c5e-4117-81e9-02c0848cbab4",
+        }
+    ),
+    "利用不可": frozenset({"e6cec404-5b34-46aa-8316-cda6695a85f3"}),
+    "通常出品": frozenset({"d664efe3-ae5a-4824-b729-e789bf93aba9"}),
+}
+
 
 class AttributeSection(StrEnum):
     """Attribute section UUIDs (02 §1 snapshot).
@@ -113,10 +124,12 @@ class AttributeResolver:
         """Two-step lookup: size group → leaf values (02 §5)."""
         section = AttributeSection.SIZE.value
         group_value = self._resolve_one(section, group_name_ja)
-        leaves = self._values(section, group_value)
+        leaves, lookup_failed = self._lookup_values(section, group_value)
         resolved: list[str] = []
         for name in names:
-            value = _match(leaves, name) or _fallback_values(self._fallback, group_value).get(name)
+            value = _match(leaves, name)
+            if value is None and lookup_failed:
+                value = _fallback_values(self._fallback, group_value).get(name)
             if value is None:
                 raise UnknownFacetValue(
                     f"size {name!r} not found in group {group_name_ja!r}; "
@@ -126,13 +139,12 @@ class AttributeResolver:
         return AttributeFilter(id=section, values=tuple(resolved))
 
     def _resolve_one(self, section: str, name: str) -> str:
-        if name in {"通常商品", "通常出品", "利用不可"}:
-            return NO_MATCH_VALUE
-        value = _match(self._values(section), name)
+        facets, lookup_failed = self._lookup_values(section)
+        value = _match(facets, name)
         if value is not None:
             return value
         fallback = _fallback_values(self._fallback, section).get(name)
-        if fallback is not None:
+        if lookup_failed and fallback is not None:
             _log.warning(
                 "attribute value %r for section %s came from the bundled snapshot; "
                 "the live facets lookup did not return it",
@@ -140,17 +152,31 @@ class AttributeResolver:
                 section,
             )
             return fallback
-        known = ", ".join(sorted(f.name or "" for f in self._values(section)))
+        if lookup_failed and section in _NO_MATCH_SECTIONS.get(name, ()):
+            _log.warning(
+                "attribute value %r for section %s used the built-in no-match value "
+                "because the live facets lookup failed",
+                name,
+                section,
+            )
+            return NO_MATCH_VALUE
+        known_names = {f.name or "" for f in facets}
+        if lookup_failed:
+            known_names.update(_fallback_values(self._fallback, section))
+        known = ", ".join(sorted(known_names))
         raise UnknownFacetValue(f"no attribute value named {name!r} in section {section}; known: {known}")
 
     def _values(self, section: str, group_value: str = "") -> list[Facet]:
+        return self._lookup_values(section, group_value)[0]
+
+    def _lookup_values(self, section: str, group_value: str = "") -> tuple[list[Facet], bool]:
         if self._facets is None:
-            return []
+            return [], True
         try:
-            return self._facets.children(section, group_value)
+            return self._facets.children(section, group_value), False
         except CarimerError as exc:  # transport/parse failure → snapshot
             _log.warning("facets lookup for section %s failed (%s); using the snapshot", section, exc)
-            return []
+            return [], True
 
 
 class AsyncAttributeResolver:
@@ -177,32 +203,44 @@ class AsyncAttributeResolver:
     async def resolve_size(self, group_name_ja: str, *names: str) -> AttributeFilter:
         section = AttributeSection.SIZE.value
         group_value = await self._resolve_one(section, group_name_ja)
-        leaves = await self._values(section, group_value)
+        leaves, lookup_failed = await self._lookup_values(section, group_value)
         resolved: list[str] = []
         for name in names:
-            value = _match(leaves, name) or _fallback_values(self._fallback, group_value).get(name)
+            value = _match(leaves, name)
+            if value is None and lookup_failed:
+                value = _fallback_values(self._fallback, group_value).get(name)
             if value is None:
                 raise UnknownFacetValue(f"size {name!r} not found in group {group_name_ja!r}")
             resolved.append(value)
         return AttributeFilter(id=section, values=tuple(resolved))
 
     async def _resolve_one(self, section: str, name: str) -> str:
-        if name in {"通常商品", "通常出品", "利用不可"}:
-            return NO_MATCH_VALUE
-        value = _match(await self._values(section), name)
+        facets, lookup_failed = await self._lookup_values(section)
+        value = _match(facets, name)
         if value is not None:
             return value
         fallback = _fallback_values(self._fallback, section).get(name)
-        if fallback is not None:
+        if lookup_failed and fallback is not None:
             _log.warning("attribute value %r for section %s came from the bundled snapshot", name, section)
             return fallback
+        if lookup_failed and section in _NO_MATCH_SECTIONS.get(name, ()):
+            _log.warning(
+                "attribute value %r for section %s used the built-in no-match value "
+                "because the live facets lookup failed",
+                name,
+                section,
+            )
+            return NO_MATCH_VALUE
         raise UnknownFacetValue(f"no attribute value named {name!r} in section {section}")
 
     async def _values(self, section: str, group_value: str = "") -> list[Facet]:
+        return (await self._lookup_values(section, group_value))[0]
+
+    async def _lookup_values(self, section: str, group_value: str = "") -> tuple[list[Facet], bool]:
         if self._facets is None:
-            return []
+            return [], True
         try:
-            return await self._facets.children(section, group_value)
+            return await self._facets.children(section, group_value), False
         except CarimerError as exc:
             _log.warning("facets lookup for section %s failed (%s); using the snapshot", section, exc)
-            return []
+            return [], True
