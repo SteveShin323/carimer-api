@@ -49,7 +49,7 @@ Confirmed rules
 | query string in `htu` | the server **compares the path only and ignores the query**: signing `?id=OTHER` for a request to `items/get?id=A` still returns 200, and so does signing with no query at all. The wrapper signs the full final URL, as the web app does |
 | `iat` | one day in the past and ten minutes in the future both return 200; not validated |
 | `jti` | a non-uuid string also returns 200 |
-| `uuid` claim | omitting it returns 200 |
+| `uuid` claim | **not optional everywhere.** Omitting it returns 200 for search, facets, detail and every other endpoint below — but `bff/home/v3/components:build` and `home/v2/homefeed-contents` then answer 200 with empty arrays. Cookies (including a real `__cf_bm`), `Origin`, `Referer` and `screenId` variants make no difference; adding the claim is what returns content (probe14-16). The wrapper always sends one |
 | key reuse | a fresh key per request is fine, so is one key for a long session, so is replaying the same token three times |
 
 ### 1.3 Two families of error response
@@ -100,10 +100,27 @@ retrying.
 | 10 | `GET /search_index/terms` | keyword autocomplete | §8.2 |
 | 11 | `GET /v2/desiredPriceItems/{id}/desiredPriceInfo` | desired-price aggregate | §8.3 |
 | 12 | `GET /services/master/v1/*`, `GET /master/v2/datasets/*`, `GET /master/get_item_*` | master data | §9 |
+| 13 | `POST /v2/entities:imageSearch` | search by picture | §10 |
+| 14 | `GET /services/bff/shops/v1/*` | Shops storefronts | §11 |
+| 15 | `POST /v2/relateditems/component`, `POST /v2/relateditems/loadmore` | the product page's recommendation shelves | §8.4 |
+| 16 | `GET /v1/marketplaces/-/products:batchGet` | several Shops products at once | §11.4 |
 
-Also called by the web item page but not investigated: `POST /v2/products:search`,
-`POST /v2/relateditems/component`, `POST /v2/relateditems/query-suggestions` (`limit` must
-be 1-6), `services/item_watch/v1/ValidateItem`, `v2/campaigns/component:get`.
+The five endpoints previously listed here as "called by the web item page but not
+investigated" were resolved on 2026-09-03:
+
+| Endpoint | Outcome |
+|---|---|
+| `POST /v2/relateditems/component` | §8.4 — five accepted component types |
+| `POST /v2/relateditems/query-suggestions` | `{itemId, limit(1-6), includeImage, itemViewRequestId}` → `{title, querySuggestions[]}` |
+| `services/item_watch/v1/ValidateItem` / `ValidateText` | internal NG-word checks. `ValidateText {"content","rule_type":3}` → `{"actionTaken":"NONE",…}`. Not listing data |
+| `POST /v2/products:search` | **dead.** Only `skuIds` is a recognised condition; `brandIds`/`categoryIds` answer 400 `search condition is empty` whether sent as numbers, strings or snake_case — and the web page's own two calls fail the same way in the browser. No route to a SKU id was found |
+| `POST /v2/campaigns/component:get` | **dead.** The body the web sends answers 404 `missing valid surface target in request` in the browser too |
+
+Anonymous but deliberately out of scope: `POST /v2/entities:count` (500 for every
+combination of `upperLimit` and `createdAfterDate` tried), `services/seolp/v2/*`,
+`v2/brands:search` (works, but `pageSize` below 50 answers 500), `users/follower_list`
+and `users/following_list`, `v1/marketplaces/shops/productRankings`,
+`v2/itemtranslations/{id}/translation`, `v2/getCurrencyConversionRate/*`.
 
 ---
 
@@ -458,6 +475,10 @@ The response is `{"result": "OK", "data": {…}, "meta": {}}`, and `data` has 50
 
 The full key set was dumped on 2026-09-02. Fixture: `tests/fixtures/shops_product.json`.
 
+`imageType=JPEG` is optional and is the Shops counterpart of `thumbnailTypes` (§3.1): it
+switches the suffix on the returned asset URLs from `…jpg@webp` to `…jpg@jpg`. The web
+sends it.
+
 Top level, 10 keys: `name` (the product id, 22 chars), `displayName`, `price` (str),
 `thumbnail`, `createTime` and `updateTime` (ISO 8601 with `Z`), `productTags` (a list —
 `sold_out` once sold, empty while on sale), `attributes` (empty in everything observed),
@@ -532,8 +553,20 @@ requested`.
 
 ### 7.4 Badges — `POST /services/usersocialjp/v1/stats/badges` and `…/has_identity_verified_badge`
 
-Body `{"userId": "<id>"}`. Responses `{"badges": [{id,name,description,iconUrl}]}` and
-`{"hasBadge": true}`. An empty `badges` array is normal.
+Body `{"user_id": "<id>", "fetch_seller_rank_badge": true}`. Responses
+`{"badges": [{id,name,description,iconUrl}]}` and `{"hasBadge": true}`. An empty `badges`
+array is normal.
+
+**`fetch_seller_rank_badge` is what returns badge id `10100` (`出品者レベルN`)**, and
+without it a seller whose only badge is the rank badge looks like it has none. The field
+name does not matter — the gateway reads `userId` and `user_id` alike — so a wrapper that
+sends `{"userId"}` and no flag silently loses one badge. Measured on two sellers with all
+four combinations (probe13d):
+
+| Body | seller A | seller B |
+|---|---|---|
+| `{"userId"}` or `{"user_id"}` | `[]` | 高評価 / まとめ買い対応実績あり / 自動まとめ買い |
+| either spelling **+ the flag** | `出品者レベル1` | the same three **+ `出品者レベル10`** |
 
 ## 8. Around an item
 
@@ -553,6 +586,40 @@ shippingMethodId(str)`.
 Response `{"data": [{"MixedQuery": {"Query": {"title", "subtitle", "search_params":
 {"keyword", "item_categories": [{id, name}]}, "score"}}}]}`.
 
+`category_id=<n>` is optional and **replaces the result set rather than filtering it**:
+`word=リング` answers ten entries unscoped and one under `category_id=83` (probe15). The
+web also sends `query_autocomplete_request_id` and `query_autocomplete_session_id`;
+omitting both changes nothing observable.
+
+### 8.4 Recommendation shelves — `POST /v2/relateditems/component` and `…/loadmore`
+
+A different axis from §8.1: the product page shows several titled shelves, each its own
+`componentType`.
+
+Body `{"itemId", "itemType": "ITEM_TYPE_MERCARI", "itemViewRequestId": <32 hex, one per
+item view>, "componentType", "pageSize"}`. Response `{"index", "componentType",
+"dataType", "header": {"title"}, "contents": [{"index", "itemContent": {"item": {…the
+§8.1 item shape…}}}], "loadMoreToken"}`.
+
+The enum is `mercari.platform.similaritemjp.v2.ComponentType` and has nine members in the
+web bundle. All nine were sent (probe18):
+
+| Value | Result |
+|---|---|
+| `COMPONENT_TYPE_CLOSE_MATCH` | 200 — この商品に近い商品 |
+| `COMPONENT_TYPE_CLOSE_MATCH_FEED` | 200 — この商品に近い商品, with a `loadMoreToken` |
+| `COMPONENT_TYPE_SIMILAR_LOOKS` | 200 — 見た目が近い商品, with a `loadMoreToken` |
+| `COMPONENT_TYPE_SIMILAR_LOOKS_ON_ITEM_THUMBNAIL` | 200, usually empty |
+| `COMPONENT_TYPE_COMPLEMENTARY_ITEMS` | 200 — このアイテムに合わせる, `dataType: "ITEM"`, usually empty |
+| `COMPONENT_TYPE_SIMILAR_ITEM`, `…_USERS_ALSO_VIEWED`, `…_SIMILAR_ITEM_HEADER` | 500 `unsupported component type` |
+| `COMPONENT_TYPE_UNSPECIFIED` | 500 `component_type is required` |
+
+`POST /v2/relateditems/loadmore` takes `{"itemViewRequestId", "pageSize", "pageToken":
+<the shelf's loadMoreToken>}` and answers `{"contents": […], "nextPageToken"}` — the same
+contents shape, and the token under a different name. The `itemViewRequestId` must be the
+one the shelf was requested with. An empty `pageToken` answers 500 `invalid load more
+token`, so check the token before paging.
+
 ### 8.3 `GET /v2/desiredPriceItems/{itemId}/desiredPriceInfo`
 
 Response `{"name": "desiredPriceItems/m…", "registeredCount", "highestDesiredPrice",
@@ -571,16 +638,120 @@ strings.
 | `GET /services/master/v1/itemSizes` | | `{"sizes": [{id, name, groupId, group}]}` | size id to group mapping |
 | `GET /services/master/v1/itemColors` | | `{"colors": [{id, name, rgb}]}`, 12 colours | legacy |
 | `GET /services/master/v1/shippingPayers` | | `{"payers": [{id, name, code}]}` | |
+| `GET /services/master/v1/shippingFromAreas` | | `{"areas": [{id, name}], "nextPageToken"}`, 48 rows | the names behind `shippingFromArea`; ids 1-47 are the JIS prefectures in order |
 | `GET /services/master/v1/shippingMethods` | | `{"methods": [{id, name, payerId, type, isDeprecated}]}` | |
 | `GET /services/master/v1/itemCategories` | | `{"categories": [{id, name, level, parentId, itemBrandGroupId, itemSizeGroupId}]}` | **the legacy tree** |
 | `GET /services/master/v1/itemBrands` | | `{"brands": [{id, name, subname, initial, groupId[]}]}` | large |
 | `GET /master/get_item_categories`, `/master/get_item_brands` | | `{"result":"OK","data":[a nested tree]}` | legacy, old tree. Not used |
 
-No prefecture master endpoint was found (`services/master/v1/prefectures` and
-`master/get_prefectures` both 404). `shippingFromArea` works for all of 1-47 and the count
-distribution matches the JIS X 0401 ordering, so the wrapper uses JIS codes directly.
+`services/master/v1/prefectures` and `master/get_prefectures` are both 404, but
+`services/master/v1/shippingFromAreas` (added to the table above on 2026-09-03) returns
+the names directly, confirming what the count distribution had already implied: ids 1-47
+are the JIS X 0401 prefectures in order.
 
-## 10. Unresolved
+Three more datasets answer 200 and are not wired into the wrapper because nothing needs
+them: `master/v2/datasets/donation_options`, `…/stamps`,
+`…/item_brands_for_content_page`, plus the legacy `master/get_config` and
+`master/get_shipping_from_areas`.
+
+## 10. Image search — `POST /v2/entities:imageSearch`
+
+The camera button in the web search box. Open to anonymous callers; the web UI could not
+be driven into making the call (React ignores a synthetic `change` on the file input), so
+the shape below comes from the request builder in the web bundle and was then verified
+directly (probe18, probe20).
+
+### 10.1 Request
+
+```json
+{
+  "userId": "",
+  "searchSessionId": "<32 hex>",
+  "pageSize": 30,
+  "config": {"responseToggles": ["WITH_FILTERING", "WITH_CATEGORY_FACETS_SUGGEST"]},
+  "imageSearchCondition": {
+    "searchCondition": {"…the §3.2 fields…", "sort": "SORT_SIMILARITY"},
+    "photoBinary": "<base64 of the image>"
+  },
+  "pageToken": ""
+}
+```
+
+- `searchCondition` is the ordinary one — every filter applies — but `sort` is
+  `SORT_SIMILARITY`, which exists only here.
+- Page one sends `photoBinary`. **Page two onwards sends `imageId` instead**, taken from
+  the previous response's `image.id`; sending the binary again also works but re-uploads
+  it. Exactly one of the two is expected.
+- The maximum accepted image size is unknown. A 32×32 JPEG works.
+
+### 10.2 Response
+
+```
+{items[…the §3.3 item shape…], nextPageToken, image{id, thumbnailUri},
+ searchConditionId, searchCondition{…echo…}, components[…]}
+```
+
+Two differences from §3.3 worth noting: **`nextPageToken` is top level, not under
+`meta`**, and there is no `numFound` at all. `image.thumbnailUri` is a signed Google
+Storage URL that expires within the minute. `components[].component.categoryFacetsSuggest
+.facets[{title, categoryId}]` is the backend's guess at which categories the picture
+belongs to.
+
+## 11. Mercari Shops storefronts — `GET /services/bff/shops/v1/*`
+
+A backend-for-frontend, so the conventions differ from the rest of the API: resource
+names are paths (`shops/{id}`, `products/{id}`, `assets/{id}`), listings page with
+`pageToken`, and every listing takes `parent`, `pageSize`, `pageToken`, `filter`,
+`orderBy` plus a view enum.
+
+`filter` is sent empty by the web everywhere. `price > 1000` and `price > 100000` were
+both accepted and both changed nothing, so no supported syntax is known.
+
+### 11.1 `GET …/shops/{shopId}/products`
+
+`?parent=shops/{id}&pageSize=100&pageToken=&filter=&orderBy=&productView=PRODUCT_VIEW_WITH_RECOMMENDED_COUPONS`
+
+Response `{"products": [{name: "products/{id}", displayName, thumbnails: [{name, type,
+uri}], price(int), inStock, createdAt, updatedAt, details{category{name,…}, dualPrice,
+mostDiscountableCoupon, recommendedCoupon}}], "nextPageToken"}`.
+
+Note the shape is **not** §6's: the timestamps are `createdAt`/`updatedAt` rather than
+`createTime`/`updateTime`, there is no `productTags`, and `thumbnails` holds asset objects
+rather than URL strings.
+
+`orderBy` matches the web's three sort buttons exactly — 新着順 sends an empty string,
+安い順 `price asc`, 高い順 `price desc` (captured from the UI). An unrecognised value is
+**ignored silently**, so a typo degrades to the default rather than failing.
+
+### 11.2 `GET …/contents/shops/{shopId}/details?name=shops/{id}&view=SHOP_DETAIL_VIEW_WITH_STATS`
+
+`{shopInfo{id, businessId, name, description, thumbnailId, thumbnailUri, shopStatus,
+applicationComprehensiveStatus, shopProductsStatus, shopApplicationStatus, createdAt(unix
+seconds as a string), updatedAt, isShopRefurbish, allowDirectMessage},
+shopReviewStats{id, score, count, version}, shopFollowedCount, shopBadges[],
+shopDescription{businessDays, sellingPrice, paymentMethods, shipments, returns, …}}`.
+
+### 11.3 `GET …/contents/shops/{shopId}/reviews?…&pageSize=20&view=PRODUCT_REVIEW_VIEW_DETAILED`
+
+`{"productReviews": [{id, productId, variantId, orderId, shopId, accountId,
+rating("RATING_GOOD"|…), comment, version, createTime, updateTime, status, assetIds[],
+product{name, displayName, thumbnails[]}}], "nextPageToken"}`.
+
+Unrelated to §7.3: these are per product, carry `RATING_*` rather than
+`good/normal/bad`, and name no user beyond an opaque `accountId`.
+
+### 11.4 `GET /v1/marketplaces/-/products:batchGet?names=…`
+
+Several Shops products in one call, answering the §6 shape. **`names` must be fully
+qualified — `marketplaces/shops/products/{id}`.** A bare id or `products/{id}` answers
+200 with an empty list rather than an error, which is a silent failure worth guarding
+against. `productDetail` comes back mostly empty, so this fills in names, prices and
+thumbnails rather than replacing §6.
+
+The same product therefore arrives under three spellings of `name`: bare from §6,
+`products/{id}` from §11.1, `marketplaces/shops/products/{id}` here.
+
+## 12. Unresolved
 
 - Whether the web 「すべて」 status checkbox sends `status: []` in the request body. The URL
   behaviour is confirmed (the parameter is `status=on_sale` when 「販売中のみ表示」 is on and
@@ -589,3 +760,7 @@ distribution matches the JIS X 0401 ordering, so the wrapper uses JIS codes dire
 - Whether app-only filters exist beyond `shippingFromArea`. No device was available to
   capture app traffic.
 - `skuIds` semantics; `isNoPrice` with the 9999999 sentinel; the exact 429 body.
+- Why `v2/entities:count` answers 500 for every anonymous combination tried, and why
+  `v2/brands:search` answers 500 for `pageSize` below 50 but not at 50 or above.
+- The maximum image size `entities:imageSearch` accepts.
+- Whether the Shops listing `filter` parameter supports any syntax at all.

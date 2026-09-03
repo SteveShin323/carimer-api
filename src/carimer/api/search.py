@@ -16,17 +16,21 @@ from carimer.transport.base import BASE_URL, Request
 
 __all__ = [
     "FACETS_URL",
+    "IMAGE_SEARCH_URL",
     "SEARCH_URL",
     "build_facets_body",
+    "build_image_search_body",
     "build_search_body",
     "decode_facet_id",
     "encode_facet_id",
     "facets_request",
+    "image_search_request",
     "search_request",
 ]
 
 SEARCH_URL = f"{BASE_URL}/v2/entities:search"
 FACETS_URL = f"{BASE_URL}/v2/facets:suggest"
+IMAGE_SEARCH_URL = f"{BASE_URL}/v2/entities:imageSearch"
 
 #: ASCII unit separator, used inside ``facetId``.
 _US = "\x1f"
@@ -101,6 +105,64 @@ def search_request(
         thumbnail_types=thumbnail_types,
     )
     return Request("POST", SEARCH_URL, json=body)
+
+
+def build_image_search_body(
+    condition: dict[str, Any],
+    *,
+    photo_b64: str | None = None,
+    image_id: str | None = None,
+    page_token: str = "",
+    page_size: int = 30,
+    session_id: str,
+) -> dict[str, Any]:
+    """The image-search body (probe18, probe20).
+
+    Exactly one of ``photo_b64`` (base64 of the image bytes) and ``image_id`` is sent:
+    the first request uploads the picture, and every later page refers to it by the
+    ``image.id`` the first response returned. Sending the binary again on page two also
+    works but re-uploads for nothing.
+
+    ``condition`` is a normal ``searchCondition`` — every filter applies — except that
+    ``sort`` is forced to ``SORT_SIMILARITY``, which is what the endpoint echoes back.
+
+    The maximum accepted image size is unknown; a 32×32 JPEG is the only size verified.
+    """
+    if (photo_b64 is None) == (image_id is None):
+        raise ValueError("pass exactly one of photo_b64 and image_id")
+    image_condition: dict[str, Any] = {"searchCondition": {**condition, "sort": "SORT_SIMILARITY"}}
+    if photo_b64 is not None:
+        image_condition["photoBinary"] = photo_b64
+    else:
+        image_condition["imageId"] = image_id
+    return {
+        "userId": "",
+        "searchSessionId": session_id,
+        "pageSize": page_size,
+        "config": {"responseToggles": ["WITH_FILTERING", "WITH_CATEGORY_FACETS_SUGGEST"]},
+        "imageSearchCondition": image_condition,
+        "pageToken": page_token,
+    }
+
+
+def image_search_request(
+    condition: dict[str, Any],
+    *,
+    photo_b64: str | None = None,
+    image_id: str | None = None,
+    page_token: str = "",
+    page_size: int = 30,
+    session_id: str,
+) -> Request:
+    body = build_image_search_body(
+        condition,
+        photo_b64=photo_b64,
+        image_id=image_id,
+        page_token=page_token,
+        page_size=page_size,
+        session_id=session_id,
+    )
+    return Request("POST", IMAGE_SEARCH_URL, json=body)
 
 
 def build_facets_body(

@@ -63,11 +63,29 @@ def test_coordinates_and_signature_halves_are_padded_to_32_bytes() -> None:
         assert len(signature) == 64
 
 
-def test_device_uuid_claim_is_optional() -> None:
+def test_device_uuid_claim_is_optional_on_the_signer() -> None:
     _, without, _ = _parts(DpopSigner().sign("POST", URL))
     assert "uuid" not in without
     _, with_uuid, _ = _parts(DpopSigner(device_uuid="dev-1").sign("POST", URL))
     assert with_uuid["uuid"] == "dev-1"
+
+
+def test_transport_always_signs_with_a_uuid_claim() -> None:
+    """Optional for search, but the feed endpoints answer empty without it (01 §1.2).
+
+    `TransportOptions.device_uuid` defaults to None and the transport then invents one
+    for `laplaceDeviceUuid`; the claim has to get that same resolved value, not the
+    None the caller passed (03 §3.1).
+    """
+    from carimer.transport.base import TransportCore, TransportOptions
+
+    core = TransportCore()
+    _, payload, _ = _parts(core.signer.sign("POST", URL))
+    assert payload["uuid"] == core.device_uuid
+
+    fixed = TransportCore(TransportOptions(device_uuid="dev-1"))
+    _, payload, _ = _parts(fixed.signer.sign("POST", URL))
+    assert payload["uuid"] == "dev-1" == fixed.device_uuid
 
 
 def test_jti_is_unique_per_token() -> None:

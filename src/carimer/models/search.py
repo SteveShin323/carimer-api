@@ -19,7 +19,14 @@ from carimer.models.facets import Brand, Size
 from carimer.models.shops import Shop
 from carimer.transport.errors import ParseError
 
-__all__ = ["Auction", "QuerySuggestChip", "SearchItem", "SearchPage"]
+__all__ = [
+    "Auction",
+    "CategorySuggestion",
+    "ImageSearchPage",
+    "QuerySuggestChip",
+    "SearchItem",
+    "SearchPage",
+]
 
 _MERCARI_ID_PREFIX = "m"
 
@@ -220,6 +227,75 @@ class SearchPage(RawModel):
             search_condition_id=to_str(payload.get("searchConditionId")),
             raw=payload,
         )
+
+
+class CategorySuggestion(RawModel):
+    """A category the image-search backend thinks the picture belongs to."""
+
+    category_id: int
+    title: str
+
+    @classmethod
+    def from_api(cls, payload: dict[str, Any]) -> CategorySuggestion | None:
+        category_id = to_int(payload.get("categoryId"))
+        title = to_str(payload.get("title"))
+        if category_id is None or not title:
+            return None
+        return cls(category_id=category_id, title=title, raw=payload)
+
+
+class ImageSearchPage(RawModel):
+    """One page of ``entities:imageSearch``.
+
+    Shaped like :class:`SearchPage` but not one: this endpoint puts ``nextPageToken`` at
+    the top level instead of under ``meta``, reports no ``numFound`` at all, and returns
+    an ``image`` the server stored — whose ``id`` is what later pages send instead of
+    re-uploading the picture.
+    """
+
+    items: list[SearchItem] = Field(default_factory=list)
+    next_page_token: str = ""
+    #: Set by ``iter_image_pages`` on the last page it yields when it stopped at
+    #: ``max_pages`` with a token still outstanding, the same way ``SearchPage.truncated``
+    #: works (03 §1.5). It matters more here: there is no ``approx_total`` to hint at how
+    #: much was left behind.
+    truncated: bool = False
+    #: Send this back as ``image_id`` for page two onwards.
+    image_id: str | None = None
+    #: Signed, short-lived URL of the uploaded picture. Expires within the minute.
+    image_url: str | None = None
+    category_suggestions: list[CategorySuggestion] = Field(default_factory=list)
+    search_condition_echo: dict[str, Any] = Field(default_factory=dict)
+    search_condition_id: str | None = None
+
+    @property
+    def has_next(self) -> bool:
+        return bool(self.next_page_token) and bool(self.items)
+
+    @classmethod
+    def from_api(cls, payload: dict[str, Any]) -> ImageSearchPage:
+        image = payload.get("image") or {}
+        return cls(
+            items=[SearchItem.from_api(raw) for raw in payload.get("items") or [] if raw],
+            next_page_token=to_str(payload.get("nextPageToken")) or "",
+            image_id=to_str(image.get("id")),
+            image_url=to_str(image.get("thumbnailUri")),
+            category_suggestions=_category_suggestions(payload.get("components") or []),
+            search_condition_echo=payload.get("searchCondition") or {},
+            search_condition_id=to_str(payload.get("searchConditionId")),
+            raw=payload,
+        )
+
+
+def _category_suggestions(components: list[dict[str, Any]]) -> list[CategorySuggestion]:
+    out: list[CategorySuggestion] = []
+    for component in components:
+        facets = (((component or {}).get("component") or {}).get("categoryFacetsSuggest") or {}).get("facets")
+        for facet in facets or []:
+            suggestion = CategorySuggestion.from_api(facet)
+            if suggestion is not None:
+                out.append(suggestion)
+    return out
 
 
 def _chips(components: list[dict[str, Any]]) -> list[QuerySuggestChip]:

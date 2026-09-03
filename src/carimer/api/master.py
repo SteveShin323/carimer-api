@@ -31,6 +31,9 @@ V1_DATASETS: Final = (
     "shippingMethods",
     "itemCategories",
     "itemBrands",
+    # `{"areas": [{"id": "1", "name": "北海道"}, ...], "nextPageToken": ""}` — the names
+    # behind `SearchQuery.shipping_from()`, which has no web UI to read them from.
+    "shippingFromAreas",
 )
 
 MASTER_NAMES: Final = V2_DATASETS + V1_DATASETS

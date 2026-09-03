@@ -10,7 +10,7 @@ from carimer.models.common import RawModel, to_int, to_str
 from carimer.models.enums import ItemKind, Status
 from carimer.transport.errors import ParseError
 
-__all__ = ["DesiredPriceInfo", "SimilarItem", "Suggestion"]
+__all__ = ["DesiredPriceInfo", "RelatedComponent", "SimilarItem", "Suggestion"]
 
 
 class SimilarItem(RawModel):
@@ -51,6 +51,47 @@ class SimilarItem(RawModel):
             thumbnail=to_str(payload.get("thumbnail")),
             category_id=to_int(payload.get("categoryId")) or None,
             highest_bid=to_int(auction.get("highestBid")),
+            raw=payload,
+        )
+
+
+class RelatedComponent(RawModel):
+    """One recommendation shelf from ``relateditems/component``, or a page of one.
+
+    The items are :class:`SimilarItem` because the payload is the same shape as
+    ``list-similar-items`` returns, one level deeper
+    (``contents[].itemContent.item``).
+
+    ``load_more_token`` comes from ``loadMoreToken`` on a shelf and from
+    ``nextPageToken`` on a ``relateditems/loadmore`` page; both feed the same call. It is
+    empty when there is nothing more, and sending an empty one answers 500, so always
+    check before paging.
+    """
+
+    title: str | None = None
+    component_type: str | None = None
+    data_type: str | None = None
+    items: list[SimilarItem] = Field(default_factory=list)
+    load_more_token: str = ""
+
+    @property
+    def has_next(self) -> bool:
+        return bool(self.load_more_token) and bool(self.items)
+
+    @classmethod
+    def from_api(cls, payload: dict[str, Any]) -> RelatedComponent:
+        items: list[SimilarItem] = []
+        for content in payload.get("contents") or []:
+            item = ((content or {}).get("itemContent") or {}).get("item")
+            if item:
+                items.append(SimilarItem.from_api(item))
+        token = to_str(payload.get("loadMoreToken")) or to_str(payload.get("nextPageToken")) or ""
+        return cls(
+            title=to_str((payload.get("header") or {}).get("title")),
+            component_type=to_str(payload.get("componentType")),
+            data_type=to_str(payload.get("dataType")),
+            items=items,
+            load_more_token=token,
             raw=payload,
         )
 

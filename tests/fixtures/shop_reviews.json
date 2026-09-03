@@ -1,0 +1,246 @@
+{
+ "productReviews": [
+  {
+   "id": "2JWGiASD2Pt82W9otJpSqA",
+   "productId": "VY9sMQSpcYc2zzcnN3LcKH",
+   "variantId": "R88PreW8pYgmAL9zkhJAZX",
+   "orderId": "2JWBSgu9c3rPQvSP4kH4cE",
+   "shopId": "BR6QXaRpWFNjGzakL5KgfZ",
+   "accountId": "account-1",
+   "rating": "RATING_GOOD",
+   "comment": "レビュー本文 1",
+   "version": 1,
+   "createTime": "2026-09-03T07:27:35Z",
+   "updateTime": "2026-09-03T07:27:35Z",
+   "status": "PRODUCT_REVIEW_STATUS_ACTIVE",
+   "assetIds": [],
+   "product": {
+    "name": "products/VY9sMQSpcYc2zzcnN3LcKH",
+    "displayName": "【公式】水 500ml 48本 ミネラルウォーター 天然水 富士山の天然水 ラベルレス 富士山の天然水500ml 天然水 バナジウム バナジウム含有 防災 備蓄 アイリスオーヤマ 富士山",
+    "thumbnails": [
+     {
+      "name": "assets/xtD2KwthFxvrVdHPq67Y6d",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/xtD2KwthFxvrVdHPq67Y6d.jpg@jpg"
+     },
+     {
+      "name": "assets/k52jvTgThVJPHVW75vSFwG",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/k52jvTgThVJPHVW75vSFwG.jpg@jpg"
+     },
+     {
+      "name": "assets/NosX6ncZasUeSDk3h2YP9X",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/NosX6ncZasUeSDk3h2YP9X.jpg@jpg"
+     },
+     {
+      "name": "assets/PmaLXDXcoTMFF3EDatBqXo",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/PmaLXDXcoTMFF3EDatBqXo.jpg@jpg"
+     },
+     {
+      "name": "assets/tkg2N3MJTUbadpxrNFpzFb",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/tkg2N3MJTUbadpxrNFpzFb.jpg@jpg"
+     },
+     {
+      "name": "assets/MXDZ8mH2x77vQGwGF7AkKD",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/MXDZ8mH2x77vQGwGF7AkKD.jpg@jpg"
+     },
+     {
+      "name": "assets/g2M7aB7sggG4cT8nNHaheS",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/g2M7aB7sggG4cT8nNHaheS.jpg@jpg"
+     },
+     {
+      "name": "assets/XpiwAkvMwzxCWqmK4uu9a7",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/XpiwAkvMwzxCWqmK4uu9a7.jpg@jpg"
+     },
+     {
+      "name": "assets/qyZ9J5HULRHzdb5FQGpAG",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/qyZ9J5HULRHzdb5FQGpAG.jpg@jpg"
+     },
+     {
+      "name": "assets/hFT9kXJQ22dgfoE2xrYQxN",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/hFT9kXJQ22dgfoE2xrYQxN.jpg@jpg"
+     }
+    ],
+    "price": 2980,
+    "inStock": true,
+    "createdAt": "2024-05-27T02:37:53Z",
+    "updatedAt": "2026-08-19T08:59:36Z",
+    "details": {
+     "category": {
+      "name": "categories/LCE9ZzVJSQ8m56oHKv9FMb",
+      "parentName": "",
+      "rootName": "",
+      "displayName": ""
+     },
+     "dualPrice": null,
+     "mostDiscountableCoupon": null,
+     "recommendedCoupon": null
+    }
+   },
+   "accountNickname": "D*",
+   "thumbnails": []
+  },
+  {
+   "id": "2JWGgqYgAzDDPPdiqCadq2",
+   "productId": "ohH4syM3vttQnr4eixYRgF",
+   "variantId": "f8gw2uDFLnDXiMiTkRBWUQ",
+   "orderId": "2JW8BZuNZRttzyLxbKpDPJ",
+   "shopId": "BR6QXaRpWFNjGzakL5KgfZ",
+   "accountId": "account-2",
+   "rating": "RATING_GOOD",
+   "comment": "レビュー本文 2",
+   "version": 1,
+   "createTime": "2026-09-03T07:14:46Z",
+   "updateTime": "2026-09-03T07:14:46Z",
+   "status": "PRODUCT_REVIEW_STATUS_ACTIVE",
+   "assetIds": [],
+   "product": {
+    "name": "products/ohH4syM3vttQnr4eixYRgF",
+    "displayName": "【公式】令和7年産 白米 米 10kg お米 10キロ 5kg×2袋 和の輝き 豊かな香り 密封新鮮パック 脱酸素剤 おいしさ長持ち製法 低温製法米 ブレンド米 精米 ストック まとめ買い アイリスオーヤマ アイリスフーズ",
+    "thumbnails": [
+     {
+      "name": "assets/2JPYLDWMZzBAzNez4ht4eP",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JPYLDWMZzBAzNez4ht4eP.jpg@jpg"
+     },
+     {
+      "name": "assets/8JyjeTa7i6hwP9uQTXuSth",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/8JyjeTa7i6hwP9uQTXuSth.jpg@jpg"
+     },
+     {
+      "name": "assets/joYvTrNuq9NUuSpd9cjWj7",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/joYvTrNuq9NUuSpd9cjWj7.jpg@jpg"
+     },
+     {
+      "name": "assets/mtoWKviwRPuynwJbtLakUA",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/mtoWKviwRPuynwJbtLakUA.jpg@jpg"
+     },
+     {
+      "name": "assets/hHvUg2jQHTT3feWKiyti8J",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/hHvUg2jQHTT3feWKiyti8J.jpg@jpg"
+     },
+     {
+      "name": "assets/vTb5fa5NvxvcUFX22RDwWW",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/vTb5fa5NvxvcUFX22RDwWW.jpg@jpg"
+     },
+     {
+      "name": "assets/oCcw4EeES5PvSZTueK4ZXj",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/oCcw4EeES5PvSZTueK4ZXj.jpg@jpg"
+     },
+     {
+      "name": "assets/d7S9o2EqKqxwESYu3KFYBg",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/d7S9o2EqKqxwESYu3KFYBg.jpg@jpg"
+     }
+    ],
+    "price": 4580,
+    "inStock": true,
+    "createdAt": "2025-10-03T02:49:33Z",
+    "updatedAt": "2026-09-01T08:38:39Z",
+    "details": {
+     "category": {
+      "name": "categories/HvD33YUu7YAJV8HCndHqma",
+      "parentName": "",
+      "rootName": "",
+      "displayName": ""
+     },
+     "dualPrice": {
+      "actualPrice": 4580,
+      "percentage": 8,
+      "createdAt": null,
+      "updatedAt": null,
+      "startAt": null,
+      "endAt": null
+     },
+     "mostDiscountableCoupon": null,
+     "recommendedCoupon": null
+    }
+   },
+   "accountNickname": "み*初",
+   "thumbnails": []
+  },
+  {
+   "id": "2JWGfcztTA77w35EQU6nyc",
+   "productId": "2JU6SnUdfWFfdd8VnJ8fgA",
+   "variantId": "2JU6SnUhSpPjikBESmTWqq",
+   "orderId": "2JWBCX3TvWxKQtxPodjY9Q",
+   "shopId": "BR6QXaRpWFNjGzakL5KgfZ",
+   "accountId": "account-3",
+   "rating": "RATING_GOOD",
+   "comment": "レビュー本文 3",
+   "version": 1,
+   "createTime": "2026-09-03T07:02:51Z",
+   "updateTime": "2026-09-03T07:02:51Z",
+   "status": "PRODUCT_REVIEW_STATUS_ACTIVE",
+   "assetIds": [],
+   "product": {
+    "name": "products/2JU6SnUdfWFfdd8VnJ8fgA",
+    "displayName": "【公式】ペットゲート 猫 犬 にゃんドアDX 脱走防止ゲート 柵 ペット ゲート 扉 ホワイト サンドベージュ 猫",
+    "thumbnails": [
+     {
+      "name": "assets/2JU6RXeWQtV2z6SteQuBwP",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JU6RXeWQtV2z6SteQuBwP.jpg@jpg"
+     },
+     {
+      "name": "assets/2JU6RXeHmABiYHUJtsCYwb",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JU6RXeHmABiYHUJtsCYwb.jpg@jpg"
+     },
+     {
+      "name": "assets/2JU6RXeMrwzNgPebB4n4dt",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JU6RXeMrwzNgPebB4n4dt.jpg@jpg"
+     },
+     {
+      "name": "assets/2JU6RXePTvpC784fSL7d4f",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JU6RXePTvpC784fSL7d4f.jpg@jpg"
+     },
+     {
+      "name": "assets/2JU6RXfetvbXDfH8495KGP",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JU6RXfetvbXDfH8495KGP.jpg@jpg"
+     },
+     {
+      "name": "assets/2JU6RXeLJeEcMvVrtvipvz",
+      "type": "ASSET_TYPE_IMAGE_JPEG",
+      "uri": "https://assets.mercari-shops-static.com/-/small/plain/2JU6RXeLJeEcMvVrtvipvz.jpg@jpg"
+     }
+    ],
+    "price": 20790,
+    "inStock": true,
+    "createdAt": "2026-07-17T07:34:19Z",
+    "updatedAt": "2026-08-26T08:10:36Z",
+    "details": {
+     "category": {
+      "name": "categories/86VFpjPw6FuK6kuB7pcueb",
+      "parentName": "",
+      "rootName": "",
+      "displayName": ""
+     },
+     "dualPrice": null,
+     "mostDiscountableCoupon": null,
+     "recommendedCoupon": null
+    }
+   },
+   "accountNickname": "あ*い",
+   "thumbnails": []
+  }
+ ],
+ "nextPageToken": "F/+BBAEBBkN1cnNvcgH/ggABDAH/gAAAE38DAQL/gAABAQEDVmFsARAAAAB4/4IAAwpjcmVhdGVkX2F0AQZzdHJpbmcMHQAbMjAyNi0wOS0wM1QwNzowMjo1MS43ODA3NDdaAAlkaXJlY3Rpb24BBnN0cmluZwwGAARkZXNjAAJpZAEGc3RyaW5nDBgAFjJKV0dmY3p0VEE3N3czNUVRVTZueWMA"
+}

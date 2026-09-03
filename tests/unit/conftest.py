@@ -76,3 +76,28 @@ def suggest_terms_payload() -> dict[str, Any]:
 @pytest.fixture
 def desired_price_payload() -> dict[str, Any]:
     return load("desired_price.json")
+
+
+@pytest.fixture
+def image_search_payload() -> dict[str, Any]:
+    return load("image_search_page.json")
+
+
+@pytest.fixture
+def shop_products_payload() -> dict[str, Any]:
+    return load("shop_products.json")
+
+
+@pytest.fixture
+def shop_details_payload() -> dict[str, Any]:
+    return load("shop_details.json")
+
+
+@pytest.fixture
+def shop_reviews_payload() -> dict[str, Any]:
+    return load("shop_reviews.json")
+
+
+@pytest.fixture
+def related_component_payload() -> dict[str, Any]:
+    return load("related_component.json")

@@ -115,6 +115,12 @@ def test_non_web_sort_combination_warns() -> None:
         SearchQuery("x").sort(Sort.SCORE, Order.ASC)
 
 
+def test_an_image_search_sort_gets_its_own_warning() -> None:
+    """`search_by_image` sets SORT_SIMILARITY itself, so arriving here is a mistake."""
+    with pytest.warns(UserWarning, match="only to search_by_image"):
+        SearchQuery("x").sort(Sort.SIMILARITY)
+
+
 @pytest.mark.parametrize(
     ("sort_by", "order_by"),
     [

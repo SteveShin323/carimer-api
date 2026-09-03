@@ -77,11 +77,18 @@ def get_reviews(
     return Request("GET", f"{BASE_URL}/reviews/history", params=params)
 
 
-def seller_badges(user_id: str) -> Request:
+def seller_badges(user_id: str, *, fetch_seller_rank_badge: bool = True) -> Request:
+    """``fetch_seller_rank_badge`` is what unlocks badge id 10100 (``出品者レベルN``).
+
+    The web sends it and the field name it uses is ``user_id``; the gateway accepts
+    either spelling, and probe13d confirmed the flag — not the spelling — is what
+    changes the response. Without it a seller whose only badge is the rank badge comes
+    back as an empty list.
+    """
     return Request(
         "POST",
         f"{BASE_URL}/services/usersocialjp/v1/stats/badges",
-        json={"userId": user_id},
+        json={"user_id": user_id, "fetch_seller_rank_badge": fetch_seller_rank_badge},
     )
 
 

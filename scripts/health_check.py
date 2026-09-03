@@ -13,12 +13,13 @@ failure. Otherwise one Mercari sidebar change turns the cron permanently red.
 Usage:
     python scripts/health_check.py [--json out.json] [--markdown] [--quiet]
 
-Calls: 11-13.
+Calls: 19-22.
 """
 
 from __future__ import annotations
 
 import argparse
+import base64
 import dataclasses
 import datetime as dt
 import json
@@ -26,12 +27,32 @@ import time
 import traceback
 from typing import Any
 
-from carimer import AttributeSection, Client, ItemKind, ItemType, SearchQuery
+from carimer import (
+    AttributeSection,
+    Client,
+    ItemKind,
+    ItemType,
+    RelatedComponentType,
+    SearchQuery,
+)
 from carimer.catalog.fallback import fallback_value_map
 from carimer.transport.base import CALL_COUNTER, TransportOptions
+from carimer.transport.errors import BlockedError, RateLimitedError
 
 REQUIRED_SECTIONS = {"category_id", "brand_id", "status", "item_condition_id", "price"}
 BASE_QUERY = SearchQuery("iphone 15").price(10_000, 80_000)
+
+#: A 32x32 JPEG, just enough to exercise `entities:imageSearch`. Results are irrelevant;
+#: the check is that the endpoint still accepts an upload and returns an `image.id`.
+_PROBE_JPEG = base64.b64decode(
+    "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a"
+    "HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAAgACABAREA/8QAHwAAAQUBAQEB"
+    "AQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1Fh"
+    "ByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZ"
+    "WmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXG"
+    "x8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/9oACAEBAAA/APn+iiiiiiiiiiiiiiii"
+    "iv/Z"
+)
 
 
 @dataclasses.dataclass
@@ -64,6 +85,9 @@ class HealthCheck:
         self._created_after_offset()
         self._badges(page)
         self._desired_price(page)
+        self._image_search()
+        self._storefront(page)
+        self._related_component(page)
         return self.checks
 
     # -- required -------------------------------------------------------------
@@ -223,12 +247,93 @@ class HealthCheck:
             check.status, check.detail = "fail", _describe(exc)
 
     def _badges(self, page: Any) -> None:
+        """Both usersocialjp calls.
+
+        Passes on the calls succeeding, not on a badge being present: many sellers
+        legitimately have none, and asserting otherwise would make the cron flaky. The
+        count goes in ``detail`` so a sudden run of zeroes is visible — which is how
+        the missing ``fetch_seller_rank_badge`` flag stayed hidden until 2026-09-03.
+        """
         check = Check("seller_badges", required=False)
         self.checks.append(check)
         try:
             seller_id = next(i.seller_id for i in page.items if i.seller_id)
+            badges = self.client.seller_badges(seller_id)
             verified = self.client.is_identity_verified(seller_id)
-            check.status, check.detail = "pass", f"identity_verified={verified}"
+            names = ", ".join(badge.name or "?" for badge in badges) or "none"
+            check.status = "pass"
+            check.detail = f"{len(badges)} badges ({names}), identity_verified={verified}"
+        except Exception as exc:
+            check.status, check.detail = "fail", _describe(exc)
+
+    def _image_search(self) -> None:
+        check = Check("image_search", required=False)
+        self.checks.append(check)
+        try:
+            page = self.client.search_by_image(_PROBE_JPEG, page_size=5)
+            check.status = "pass" if page.image_id else "fail"
+            check.detail = (
+                f"{len(page.items)} items, image_id={'yes' if page.image_id else 'no'}, "
+                f"category_suggestions={len(page.category_suggestions)}"
+            )
+        except Exception as exc:
+            check.status, check.detail = "fail", _describe(exc)
+
+    def _storefront(self, page: Any) -> None:
+        check = Check("shops_storefront", required=False)
+        self.checks.append(check)
+        try:
+            shop_id = next(
+                (i.shop.id for i in page.items if i.shop and i.shop.id),
+                None,
+            )
+            if shop_id is None:
+                check.status, check.detail = "skipped", "no Shops item on the first page"
+                return
+            detail = self.client.shops.details(shop_id)
+            products, token = self.client.shops.products(shop_id, page_size=5)
+            check.status = "pass" if detail.id and products else "fail"
+            check.detail = (
+                f"{detail.name!r}: {len(products)} products, "
+                f"reviews={detail.review_count}, next={'yes' if token else 'no'}"
+            )
+        except Exception as exc:
+            check.status, check.detail = "fail", _describe(exc)
+
+    def _related_component(self, page: Any) -> None:
+        """The five component types accepted as of 2026-09-03 (probe18).
+
+        Reported as a diff rather than a failure: the enum has nine members in the web
+        bundle and which of them the server accepts has already moved once.
+
+        A block or a rate limit is re-raised instead of being counted as a rejection.
+        Swallowing it would turn "this IP is blocked" into "Mercari removed every
+        component type", which is the one misdiagnosis this check must not make. It is
+        also the most expensive check here: five calls of the script's twenty-one.
+        """
+        check = Check("related_components", required=False)
+        self.checks.append(check)
+        try:
+            item = next((i for i in page.items if i.kind is ItemKind.MERCARI), None)
+            if item is None:
+                check.status, check.detail = "skipped", "no personal listing on the first page"
+                return
+            accepted: list[str] = []
+            rejected: list[str] = []
+            for component_type in RelatedComponentType:
+                try:
+                    component = self.client.related_component(item.id, component_type, page_size=3)
+                except (BlockedError, RateLimitedError):
+                    raise
+                except Exception:  # a rejected type is data here, not a failure
+                    rejected.append(component_type.name)
+                    continue
+                accepted.append(f"{component_type.name}({len(component.items)})")
+            check.diff = {"accepted": accepted, "rejected": rejected}
+            check.status = "pass" if accepted else "fail"
+            check.detail = f"accepted {len(accepted)}/{len(RelatedComponentType)}: " + ", ".join(accepted)
+            if rejected:
+                check.detail += f" — rejected: {', '.join(rejected)}"
         except Exception as exc:
             check.status, check.detail = "fail", _describe(exc)
 

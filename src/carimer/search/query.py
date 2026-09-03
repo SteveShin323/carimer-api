@@ -16,6 +16,7 @@ from datetime import datetime
 from typing import Any, Self
 
 from carimer.models.enums import (
+    ENDPOINT_ONLY_SORTS,
     WEB_SORT_COMBINATIONS,
     Condition,
     ItemType,
@@ -108,8 +109,16 @@ class SearchQuery:
         return dataclasses.replace(self, exclude_keyword=keyword)
 
     def sort(self, sort_by: Sort, order_by: Order = Order.DESC) -> Self:
-        """Warn on a combination the web UI does not offer (01 §3.5 — it is ignored)."""
-        if (sort_by, order_by) not in WEB_SORT_COMBINATIONS:
+        """Warn on a combination the web UI does not offer (01 §3.5 — it is ignored).
+
+        A sort that belongs to another endpoint gets its own message: reaching this
+        method with one means it is headed for ``entities:search``, which is precisely
+        where it does nothing. ``search_by_image`` never comes through here.
+        """
+        elsewhere = ENDPOINT_ONLY_SORTS.get(sort_by)
+        if elsewhere is not None:
+            warnings.warn(f"{sort_by.value} {elsewhere}", UserWarning, stacklevel=2)
+        elif (sort_by, order_by) not in WEB_SORT_COMBINATIONS:
             warnings.warn(
                 f"{sort_by.value} + {order_by.value} is not one of the five combinations the web "
                 f"UI offers; the server ignores it and sorts descending (01 §3.5)",

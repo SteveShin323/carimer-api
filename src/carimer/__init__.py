@@ -16,18 +16,34 @@ from carimer.models.enums import (
     ItemKind,
     ItemType,
     Order,
+    RelatedComponentType,
     ShippingMethod,
     ShippingPayer,
+    ShopProductOrder,
     Sort,
     Status,
     ThumbnailType,
 )
 from carimer.models.facets import Brand, CategoryNode, Facet, FacetSection, Size, SizeGroup
 from carimer.models.item import ConvertedPrice, EmbeddedSeller, Item, ItemAttribute, ItemComment
-from carimer.models.misc import DesiredPriceInfo, SimilarItem, Suggestion
+from carimer.models.misc import DesiredPriceInfo, RelatedComponent, SimilarItem, Suggestion
 from carimer.models.profile import Badge, Profile, Review, SellerItem
-from carimer.models.search import Auction, QuerySuggestChip, SearchItem, SearchPage
-from carimer.models.shops import Shop, ShopsProduct, ShopsVariant
+from carimer.models.search import (
+    Auction,
+    CategorySuggestion,
+    ImageSearchPage,
+    QuerySuggestChip,
+    SearchItem,
+    SearchPage,
+)
+from carimer.models.shops import (
+    Shop,
+    ShopDetail,
+    ShopReview,
+    ShopsProduct,
+    ShopsProductSummary,
+    ShopsVariant,
+)
 from carimer.search.attributes import (
     AsyncAttributeResolver,
     AttributeFilter,
@@ -35,6 +51,7 @@ from carimer.search.attributes import (
     AttributeSection,
 )
 from carimer.search.query import SearchQuery
+from carimer.storefront import AsyncShopsClient, ShopsClient
 from carimer.transport.base import TransportOptions
 from carimer.transport.errors import (
     AuthError,
@@ -55,6 +72,7 @@ __all__ = [
     "AsyncCategories",
     "AsyncClient",
     "AsyncFacetsClient",
+    "AsyncShopsClient",
     "AttributeFilter",
     "AttributeResolver",
     "AttributeSection",
@@ -67,6 +85,7 @@ __all__ = [
     "CarimerError",
     "Categories",
     "CategoryNode",
+    "CategorySuggestion",
     "CategoryTree",
     "Client",
     "Condition",
@@ -76,6 +95,7 @@ __all__ = [
     "Facet",
     "FacetSection",
     "FacetsClient",
+    "ImageSearchPage",
     "Item",
     "ItemAttribute",
     "ItemComment",
@@ -88,6 +108,8 @@ __all__ = [
     "Profile",
     "QuerySuggestChip",
     "RateLimitedError",
+    "RelatedComponent",
+    "RelatedComponentType",
     "Review",
     "SearchItem",
     "SearchPage",
@@ -96,8 +118,13 @@ __all__ = [
     "ShippingMethod",
     "ShippingPayer",
     "Shop",
+    "ShopDetail",
+    "ShopProductOrder",
+    "ShopReview",
+    "ShopsClient",
     "ShopsItemError",
     "ShopsProduct",
+    "ShopsProductSummary",
     "ShopsVariant",
     "SimilarItem",
     "Size",

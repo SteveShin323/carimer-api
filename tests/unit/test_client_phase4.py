@@ -228,6 +228,12 @@ def test_master_v1_path_and_default_accept() -> None:
     assert route.calls[0].request.headers["accept"] == "application/json, text/plain, */*"
 
 
+def test_shipping_from_areas_is_a_known_v1_dataset() -> None:
+    """The names behind `SearchQuery.shipping_from()`, which has no web UI."""
+    request = master_api.dataset("shippingFromAreas")
+    assert request.url.endswith("/services/master/v1/shippingFromAreas")
+
+
 def test_unknown_master_name_raises_value_error() -> None:
     with pytest.raises(ValueError, match="unknown master dataset"):
         master_api.dataset("foo")
@@ -268,7 +274,11 @@ def test_badges_and_identity_verification() -> None:
             verified = client.is_identity_verified("1")
     assert [badge.id for badge in badges] == ["b"]
     assert verified is True
-    assert json.loads(badge_route.calls[0].request.content) == {"userId": "1"}
+    # The flag, not the field name, is what unlocks badge 10100 (probe13d).
+    assert json.loads(badge_route.calls[0].request.content) == {
+        "user_id": "1",
+        "fetch_seller_rank_badge": True,
+    }
 
 
 def test_suggest_keywords(suggest_terms_payload: dict[str, Any]) -> None:
@@ -279,6 +289,31 @@ def test_suggest_keywords(suggest_terms_payload: dict[str, Any]) -> None:
             suggestions = client.suggest_keywords("iphone")
     assert suggestions
     assert route.calls[0].request.url.params["brand_category_result_included"] == "true"
+    assert "category_id" not in route.calls[0].request.url.params
+
+
+def test_suggest_keywords_can_be_scoped_to_a_category(
+    suggest_terms_payload: dict[str, Any],
+) -> None:
+    """The web search box sends it and it changes the result set outright (probe15)."""
+    url = f"{BASE_URL}/search_index/terms"
+    with respx.mock as mock:
+        route = mock.get(url).mock(return_value=httpx.Response(200, json=suggest_terms_payload))
+        with Client(options=FAST) as client:
+            client.suggest_keywords("リング", category_id=83)
+    assert route.calls[0].request.url.params["category_id"] == "83"
+
+
+def test_seller_items_can_exclude_archived() -> None:
+    url = f"{BASE_URL}/items/get_items"
+    body = {"data": [], "meta": {"has_next": False}}
+    with respx.mock as mock:
+        route = mock.get(url).mock(return_value=httpx.Response(200, json=body))
+        with Client(options=FAST) as client:
+            list(client.iter_seller_items("1"))
+            list(client.iter_seller_items("1", exclude_archived=True))
+    assert "exclude_archived_item" not in route.calls[0].request.url.params
+    assert route.calls[1].request.url.params["exclude_archived_item"] == "true"
 
 
 # -- async parity --------------------------------------------------------------

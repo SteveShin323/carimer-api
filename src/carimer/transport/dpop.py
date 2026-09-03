@@ -43,7 +43,10 @@ class DpopSigner:
     """Signs one ``DPoP`` header value per request.
 
     ``rotate_every=N`` replaces the key after N signatures (``0`` = never, the
-    default). ``device_uuid`` becomes the optional ``uuid`` claim the web app sends.
+    default). ``device_uuid`` becomes the ``uuid`` claim the web app sends. Search works
+    without it, but ``bff/home/v3/components:build`` and ``home/v2/homefeed-contents``
+    answer 200 with empty arrays when it is missing (01 §1.2), so the transport always
+    passes one.
     """
 
     def __init__(

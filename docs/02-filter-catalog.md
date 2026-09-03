@@ -160,6 +160,9 @@ Sorting — only these five combinations exist in the web UI
 | 価格の高い順 | `SORT_PRICE` | `ORDER_DESC` |
 | いいね！順 | `SORT_NUM_LIKES` | `ORDER_DESC` |
 
+A sixth value, `SORT_SIMILARITY`, exists on `entities:imageSearch` only (01 §10) and has
+no meaning on `entities:search`.
+
 Status: `STATUS_ON_SALE` (販売中), `STATUS_TRADING` + `STATUS_SOLD_OUT` (売り切れ), `[]`
 (すべて).
 
@@ -179,7 +182,9 @@ Shipping-method ids for `excludeShippingMethodIds`: 1 未定, 3 クロネコヤ�
 `shippingPayerId`) or `services/master/v1/shippingMethods`.
 
 Shipping origin (`shippingFromArea`): **all of 1-47 confirmed working as JIS X 0401
-codes** (01 §3.2). There is no dedicated master endpoint.
+codes** (01 §3.2). `services/master/v1/shippingFromAreas` returns the names
+(`{"areas": [{"id": "1", "name": "北海道"}, …]}`, 48 rows), which is the only place to
+read them — the filter has no web UI.
 
 ## 7. Web UI elements that are not part of the result list
 
@@ -187,5 +192,8 @@ codes** (01 §3.2). There is no dedicated master endpoint.
   `components[].querySuggest.suggestFacets.facets[].searchableValue` where
   `searchableKey` is `keyword`.
 - Suggested categories come from `relevantFacets` on a `category_id` facet request.
-- Autocomplete comes from `search_index/terms`.
+- Autocomplete comes from `search_index/terms`, optionally scoped with `category_id`
+  (01 §8.2).
+- The camera button beside the search box is `entities:imageSearch` (01 §10), which takes
+  the same `searchCondition` as the sidebar filters.
 - 「この検索条件を保存する」 requires a login and is out of scope.

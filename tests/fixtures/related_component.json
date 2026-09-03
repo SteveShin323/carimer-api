@@ -1,0 +1,96 @@
+{
+ "index": 0,
+ "componentType": "COMPONENT_TYPE_CLOSE_MATCH_FEED",
+ "dataType": "ITEM_SET",
+ "header": {
+  "title": "この商品に近い商品"
+ },
+ "contents": [
+  {
+   "index": 0,
+   "itemContent": {
+    "item": {
+     "id": "m74416381427",
+     "name": "Apple iPhone 本体",
+     "price": "40000",
+     "status": "on_sale",
+     "thumbnail": "https://static.mercdn.net/thumb/item/webp/m74416381427_1.jpg?1787873413",
+     "type": "ITEM_TYPE_MERCARI",
+     "auctionInfo": null,
+     "isLiked": false,
+     "categoryId": "0",
+     "shippingMethodId": "0"
+    }
+   }
+  },
+  {
+   "index": 1,
+   "itemContent": {
+    "item": {
+     "id": "m90934301212",
+     "name": "Apple iPhone 本体",
+     "price": "64000",
+     "status": "on_sale",
+     "thumbnail": "https://static.mercdn.net/thumb/item/webp/m90934301212_1.jpg?1787386540",
+     "type": "ITEM_TYPE_MERCARI",
+     "auctionInfo": null,
+     "isLiked": false,
+     "categoryId": "0",
+     "shippingMethodId": "0"
+    }
+   }
+  },
+  {
+   "index": 2,
+   "itemContent": {
+    "item": {
+     "id": "m36210076259",
+     "name": "Apple iPhone 本体",
+     "price": "66666",
+     "status": "on_sale",
+     "thumbnail": "https://static.mercdn.net/thumb/item/webp/m36210076259_1.jpg?1787397410",
+     "type": "ITEM_TYPE_MERCARI",
+     "auctionInfo": null,
+     "isLiked": false,
+     "categoryId": "0",
+     "shippingMethodId": "0"
+    }
+   }
+  },
+  {
+   "index": 3,
+   "itemContent": {
+    "item": {
+     "id": "m93828013713",
+     "name": "iPhone",
+     "price": "34500",
+     "status": "on_sale",
+     "thumbnail": "https://static.mercdn.net/thumb/item/webp/m93828013713_1.jpg?1782621771",
+     "type": "ITEM_TYPE_MERCARI",
+     "auctionInfo": null,
+     "isLiked": false,
+     "categoryId": "0",
+     "shippingMethodId": "0"
+    }
+   }
+  },
+  {
+   "index": 4,
+   "itemContent": {
+    "item": {
+     "id": "m20003226354",
+     "name": "美品 バッテリー純正100% Apple iPhone 14 Pro 128GB",
+     "price": "95000",
+     "status": "on_sale",
+     "thumbnail": "https://static.mercdn.net/thumb/item/webp/m20003226354_1.jpg?1787973982",
+     "type": "ITEM_TYPE_MERCARI",
+     "auctionInfo": null,
+     "isLiked": false,
+     "categoryId": "0",
+     "shippingMethodId": "0"
+    }
+   }
+  }
+ ],
+ "loadMoreToken": "F_-LBAEBBkN1cnNvcgH_jAABDAH_igAAFP-JAwEC_4oAAQEBA1ZhbAEQAAAA_53_jAAHBkl0ZW1JRAEGc3RyaW5nDA4ADG02NDg1MDE2MzgxMAAISXRlbVR5cGUBBWludDMyBAIAAgANQ29tcG9uZW50VHlwZQEFaW50MzIEAgAOAAhEYXRhVHlwZQEFaW50MzIEAgACAAhQYWdlU2l6ZQEFaW50MzIEAgAKAApJdGVtU3RhdHVzAQdbXWludDMy_40CAQL_jgABBAAAHv-OAwABAgAKU3RhcnRJbmRleAEFaW50MzIEAgAKAA"
+}

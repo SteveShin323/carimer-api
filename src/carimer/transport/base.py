@@ -100,12 +100,15 @@ class TransportCore:
 
     def __init__(self, options: TransportOptions | None = None) -> None:
         self.options = options or TransportOptions()
-        self._signer = DpopSigner(
-            device_uuid=self.options.device_uuid,
-            rotate_every=self.options.rotate_every,
-        )
         self._search_session_id = _new_session_id()
         self._device_uuid = self.options.device_uuid or str(uuid.uuid4())
+        # The resolved uuid, not options.device_uuid: 03 §3.1 says one value feeds both
+        # `laplaceDeviceUuid` and the DPoP `uuid` claim, and the feed endpoints answer
+        # 200 with empty arrays when the claim is absent (01 §1.2).
+        self._signer = DpopSigner(
+            device_uuid=self._device_uuid,
+            rotate_every=self.options.rotate_every,
+        )
 
     @property
     def signer(self) -> DpopSigner:
