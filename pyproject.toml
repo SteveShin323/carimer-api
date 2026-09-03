@@ -49,7 +49,7 @@ packages = ["src/carimer"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "--strict-markers -q"
+addopts = "--strict-markers -q -m 'not live'"
 markers = [
   "live: hits the real api.mercari.jp (excluded by default)",
   "smoke: minimal live sanity set (6 calls: 3 search, 1 facets, 1 item, 1 shops)",
