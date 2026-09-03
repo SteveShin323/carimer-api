@@ -10,6 +10,9 @@ from __future__ import annotations
 import secrets
 import uuid
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
+from math import isfinite
 from typing import Any, Final
 
 import httpx
@@ -89,6 +92,7 @@ class TransportOptions:
     proxy: str | None = None
     backoff_base: float = 0.5
     backoff_max: float = 8.0
+    max_retry_after: float | None = 3600.0
 
 
 class TransportCore:
@@ -161,8 +165,12 @@ class TransportCore:
 
     def backoff_delay(self, attempt: int, retry_after: float | None = None) -> float:
         if retry_after is not None and retry_after >= 0:
-            return min(retry_after, self.options.backoff_max)
+            return retry_after
         return min(self.options.backoff_base * 2.0**attempt, self.options.backoff_max)
+
+    def retry_after_exceeds_limit(self, retry_after: float | None) -> bool:
+        limit = self.options.max_retry_after
+        return retry_after is not None and limit is not None and retry_after > limit
 
     def error_for(self, status: int, headers: dict[str, str] | None, body: bytes) -> errors.CarimerError:
         return errors.from_response(status, headers, body)
@@ -172,14 +180,24 @@ def _new_session_id() -> str:
     return secrets.token_hex(16)
 
 
-def retry_after_seconds(response: httpx.Response) -> float | None:
+def retry_after_seconds(response: httpx.Response, *, now: datetime | None = None) -> float | None:
     raw = response.headers.get("retry-after")
     if raw is None:
         return None
     try:
-        return float(raw)
+        seconds = float(raw)
     except ValueError:
+        try:
+            retry_at = parsedate_to_datetime(raw)
+        except (TypeError, ValueError, OverflowError):
+            return None
+        if retry_at.tzinfo is None:
+            return None
+        current = now or datetime.now(UTC)
+        return max(0.0, (retry_at - current).total_seconds())
+    if not isfinite(seconds) or seconds < 0:
         return None
+    return seconds
 
 
 def json_body(response: httpx.Response) -> dict[str, Any]:

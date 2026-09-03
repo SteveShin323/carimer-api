@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from threading import Lock
 from types import TracebackType
 from typing import Any
 
@@ -41,6 +42,7 @@ class SyncTransport(TransportCore):
             proxy=self.options.proxy,
             follow_redirects=True,
         )
+        self._lock = Lock()
         self._last_sent: float | None = None
 
     def __enter__(self) -> SyncTransport:
@@ -61,30 +63,40 @@ class SyncTransport(TransportCore):
     def send(self, request: Request) -> dict[str, Any]:
         attempt = 0
         while True:
-            self._wait_for_slot()
             try:
-                response = self._client.request(
-                    request.method,
-                    request.url,
-                    params=request.params,
-                    json=request.json,
-                    headers=self.headers_for(request),
-                )
+                response = self._send_once(request)
             except httpx.HTTPError as exc:
                 if attempt >= self.options.max_retries:
                     raise errors.TransportError(f"{type(exc).__name__}: {exc}") from exc
                 time.sleep(self.backoff_delay(attempt))
                 attempt += 1
                 continue
-            CALL_COUNTER.record(str(response.request.url))
             if response.status_code >= 400:
                 if self.should_retry(response.status_code, attempt):
                     retry_after = retry_after_seconds(response)
+                    if self.retry_after_exceeds_limit(retry_after):
+                        if response.status_code == 429:
+                            raise errors.RateLimitedError(retry_after)
+                        raise self.error_for(response.status_code, dict(response.headers), response.content)
                     time.sleep(self.backoff_delay(attempt, retry_after))
                     attempt += 1
                     continue
                 raise self.error_for(response.status_code, dict(response.headers), response.content)
             return json_body(response)
+
+    def _send_once(self, request: Request) -> httpx.Response:
+        """One attempt. The lock keeps concurrency at 1 and guards the pacing clock."""
+        with self._lock:
+            self._wait_for_slot()
+            response = self._client.request(
+                request.method,
+                request.url,
+                params=request.params,
+                json=request.json,
+                headers=self.headers_for(request),
+            )
+        CALL_COUNTER.record(str(response.request.url))
+        return response
 
     def _wait_for_slot(self) -> None:
         interval = self.options.min_interval

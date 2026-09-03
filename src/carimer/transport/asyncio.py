@@ -73,7 +73,12 @@ class AsyncTransport(TransportCore):
                 continue
             if response.status_code >= 400:
                 if self.should_retry(response.status_code, attempt):
-                    await asyncio.sleep(self.backoff_delay(attempt, retry_after_seconds(response)))
+                    retry_after = retry_after_seconds(response)
+                    if self.retry_after_exceeds_limit(retry_after):
+                        if response.status_code == 429:
+                            raise errors.RateLimitedError(retry_after)
+                        raise self.error_for(response.status_code, dict(response.headers), response.content)
+                    await asyncio.sleep(self.backoff_delay(attempt, retry_after))
                     attempt += 1
                     continue
                 raise self.error_for(response.status_code, dict(response.headers), response.content)

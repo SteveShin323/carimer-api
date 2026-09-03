@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import httpx
 import pytest
 import respx
 
 from carimer.transport import errors
 from carimer.transport.asyncio import AsyncTransport
-from carimer.transport.base import CALL_COUNTER, Request, TransportOptions
+from carimer.transport.base import CALL_COUNTER, Request, TransportOptions, retry_after_seconds
 from carimer.transport.sync import SyncTransport
 
 SEARCH = "https://api.mercari.jp/v2/entities:search"
@@ -143,8 +145,44 @@ def test_backoff_delay_grows_and_is_capped() -> None:
     transport = SyncTransport(TransportOptions(backoff_base=0.5, backoff_max=8.0))
     assert [transport.backoff_delay(i) for i in range(6)] == [0.5, 1.0, 2.0, 4.0, 8.0, 8.0]
     assert transport.backoff_delay(0, retry_after=3.0) == 3.0
-    assert transport.backoff_delay(0, retry_after=99.0) == 8.0
+    assert transport.backoff_delay(0, retry_after=99.0) == 99.0
     transport.close()
+
+
+def test_retry_after_parses_http_date() -> None:
+    response = httpx.Response(429, headers={"Retry-After": "Wed, 21 Oct 2015 07:28:00 GMT"})
+    now = datetime(2015, 10, 21, 7, 27, tzinfo=UTC)
+
+    assert retry_after_seconds(response, now=now) == 60.0
+
+
+def test_sync_transport_honours_retry_after_without_backoff_clamp(monkeypatch: pytest.MonkeyPatch) -> None:
+    sleeps: list[float] = []
+    monkeypatch.setattr("carimer.transport.sync.time.sleep", sleeps.append)
+    responses = [
+        httpx.Response(429, headers={"Retry-After": "120"}),
+        httpx.Response(200, json={}),
+    ]
+
+    with respx.mock as mock:
+        route = mock.post(SEARCH).mock(side_effect=responses)
+        options = TransportOptions(min_interval=0, max_retries=1, backoff_max=8)
+        with SyncTransport(options) as transport:
+            assert transport.send(_post()) == {}
+
+    assert route.call_count == 2
+    assert sleeps == [120.0]
+
+
+def test_retry_after_above_explicit_ceiling_fails_instead_of_retrying() -> None:
+    with respx.mock as mock:
+        route = mock.post(SEARCH).mock(return_value=httpx.Response(429, headers={"Retry-After": "120"}))
+        options = TransportOptions(min_interval=0, max_retries=3, max_retry_after=60)
+        with SyncTransport(options) as transport, pytest.raises(errors.RateLimitedError) as exc_info:
+            transport.send(_post())
+
+    assert route.call_count == 1
+    assert exc_info.value.retry_after == 120.0
 
 
 # -- pacing and counting ------------------------------------------------------
@@ -161,6 +199,42 @@ def test_min_interval_spaces_requests() -> None:
             transport.send(_post())
             elapsed = time.monotonic() - start
     assert elapsed >= 0.25
+
+
+def test_sync_requests_are_serialised_and_spaced_across_threads() -> None:
+    import threading
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+    from itertools import pairwise
+
+    in_flight = 0
+    peak = 0
+    starts: list[float] = []
+    state_lock = threading.Lock()
+    interval = 0.03
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal in_flight, peak
+        with state_lock:
+            starts.append(time.monotonic())
+            in_flight += 1
+            peak = max(peak, in_flight)
+        time.sleep(0.01)
+        with state_lock:
+            in_flight -= 1
+        return httpx.Response(200, json={})
+
+    with respx.mock as mock:
+        mock.post(SEARCH).mock(side_effect=handler)
+        with (
+            SyncTransport(TransportOptions(min_interval=interval)) as transport,
+            ThreadPoolExecutor(max_workers=4) as pool,
+        ):
+            results = list(pool.map(lambda _: transport.send(_post()), range(4)))
+
+    assert results == [{}, {}, {}, {}]
+    assert peak == 1
+    assert all(later - earlier >= interval - 0.005 for earlier, later in pairwise(starts))
 
 
 def test_call_counter_records_path() -> None:
@@ -200,6 +274,18 @@ async def test_async_transport_retries_5xx_and_blocks_on_403() -> None:
             with pytest.raises(errors.BlockedError):
                 await transport.send(_post())
         assert route.call_count == 1
+
+
+async def test_async_retry_after_above_explicit_ceiling_fails_without_retrying() -> None:
+    with respx.mock as mock:
+        route = mock.post(SEARCH).mock(return_value=httpx.Response(429, headers={"Retry-After": "120"}))
+        options = TransportOptions(min_interval=0, max_retries=3, max_retry_after=60)
+        async with AsyncTransport(options) as transport:
+            with pytest.raises(errors.RateLimitedError) as exc_info:
+                await transport.send(_post())
+
+    assert route.call_count == 1
+    assert exc_info.value.retry_after == 120.0
 
 
 async def test_async_requests_are_serialised_by_the_lock() -> None:
