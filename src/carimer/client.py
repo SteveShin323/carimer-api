@@ -243,6 +243,7 @@ class Client:
         since: int | None = None,
         include_shops: bool = False,
         max_cycles: int | None = None,
+        max_pages_per_cycle: int = paginate.DEFAULT_MAX_PAGES,
     ) -> int:
         """Poll for newly listed items; see :func:`carimer.search.monitor.watch_new_listings`."""
         return monitor.watch_new_listings(
@@ -253,6 +254,7 @@ class Client:
             since=since,
             include_shops=include_shops,
             max_cycles=max_cycles,
+            max_pages_per_cycle=max_pages_per_cycle,
         )
 
 
@@ -478,6 +480,7 @@ class AsyncClient:
         since: int | None = None,
         include_shops: bool = False,
         max_cycles: int | None = None,
+        max_pages_per_cycle: int = paginate.DEFAULT_MAX_PAGES,
     ) -> int:
         """Poll for newly listed items; see :func:`carimer.search.monitor.awatch_new_listings`."""
         return await monitor.awatch_new_listings(
@@ -488,6 +491,7 @@ class AsyncClient:
             since=since,
             include_shops=include_shops,
             max_cycles=max_cycles,
+            max_pages_per_cycle=max_pages_per_cycle,
         )
 
 

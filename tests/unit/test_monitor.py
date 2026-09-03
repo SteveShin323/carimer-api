@@ -10,7 +10,7 @@ import respx
 
 from carimer import Client, TransportOptions
 from carimer.api.search import SEARCH_URL
-from carimer.models.enums import ItemType
+from carimer.models.enums import ItemType, Order, Sort
 from carimer.models.search import SearchItem, SearchPage
 from carimer.search.monitor import OVERLAP_SECONDS, watch_new_listings
 from carimer.search.query import JST_OFFSET_SECONDS, SearchQuery
@@ -73,6 +73,8 @@ def test_first_cycle_seeds_without_calling_back() -> None:
     assert calls == []
     assert since == T0 - 10  # newest created seen
     assert "createdAfterDate" not in client.conditions[0]
+    assert client.conditions[0]["sort"] == Sort.CREATED_TIME.value
+    assert client.conditions[0]["order"] == Order.DESC.value
 
 
 def test_later_cycles_report_only_new_ids() -> None:
@@ -252,6 +254,86 @@ def test_client_facade_watch_sends_the_expected_body() -> None:
     assert second["itemTypes"] == [ItemType.MERCARI.value]
 
 
+class PagedFakeClient:
+    def __init__(self, pages: list[tuple[list[dict[str, Any]], str]]) -> None:
+        self._pages = pages
+        self.tokens: list[str] = []
+        self.conditions: list[dict[str, Any]] = []
+
+    def search(self, query: SearchQuery | str, *, page_token: str = "", page_size: int = 120) -> SearchPage:
+        assert not isinstance(query, str)
+        self.tokens.append(page_token)
+        self.conditions.append(query.to_condition())
+        items, next_token = self._pages[len(self.tokens) - 1]
+        return SearchPage.from_api(
+            {"meta": {"numFound": str(len(items)), "nextPageToken": next_token}, "items": items}
+        )
+
+
+def test_each_poll_cycle_exhausts_the_created_time_window() -> None:
+    client = PagedFakeClient(
+        [
+            ([_item("newest", T0 + 30), _item("duplicate", T0 + 20)], "page-2"),
+            ([_item("duplicate", T0 + 20), _item("deep", T0 + 10)], ""),
+        ]
+    )
+    batches: list[list[str]] = []
+
+    since = watch_new_listings(
+        client,
+        "x",
+        on_new=lambda items: batches.append([item.id for item in items]),
+        since=T0,
+        max_cycles=1,
+        sleep=lambda _: None,
+    )
+
+    assert client.tokens == ["", "page-2"]
+    assert batches == [["newest", "duplicate", "deep"]]
+    assert since == T0 + 30
+
+
+def test_page_cap_warns_and_does_not_advance_the_watermark(caplog: Any) -> None:
+    client = PagedFakeClient([([_item("new", T0 + 30)], "page-2")])
+
+    since = watch_new_listings(
+        client,
+        "x",
+        on_new=lambda items: None,
+        since=T0,
+        max_cycles=1,
+        max_pages_per_cycle=1,
+        sleep=lambda _: None,
+    )
+
+    assert since == T0
+    assert any("listings beyond the cap may be missed" in record.message for record in caplog.records)
+
+
+def test_seen_ids_are_pruned_after_the_overlap_window() -> None:
+    client = FakeClient(
+        [
+            [_item("moving", T0 + 1)],
+            [_item("later", T0 + 100)],
+            [_item("moving", T0 + 110)],
+        ]
+    )
+    batches: list[list[str]] = []
+
+    watch_new_listings(
+        client,
+        "x",
+        on_new=lambda items: batches.append([item.id for item in items]),
+        since=T0,
+        include_shops=True,
+        interval=0,
+        max_cycles=3,
+        sleep=lambda _: None,
+    )
+
+    assert batches == [["moving"], ["later"], ["moving"]]
+
+
 async def test_async_watcher_awaits_a_coroutine_callback() -> None:
     class FakeAsyncClient(FakeClient):
         async def search(  # type: ignore[override]
@@ -272,3 +354,33 @@ async def test_async_watcher_awaits_a_coroutine_callback() -> None:
     )
     assert batches == [["m2"]]
     assert since == T0 + 5
+
+
+async def test_async_watcher_exhausts_the_created_time_window() -> None:
+    class PagedAsyncClient(PagedFakeClient):
+        async def search(  # type: ignore[override]
+            self, query: SearchQuery | str, *, page_token: str = "", page_size: int = 120
+        ) -> SearchPage:
+            return PagedFakeClient.search(self, query, page_token=page_token, page_size=page_size)
+
+    from carimer.search.monitor import awatch_new_listings
+
+    client = PagedAsyncClient(
+        [
+            ([_item("newest", T0 + 30)], "page-2"),
+            ([_item("deep", T0 + 10)], ""),
+        ]
+    )
+    batches: list[list[str]] = []
+
+    since = await awatch_new_listings(
+        client,
+        "x",
+        on_new=lambda items: batches.append([item.id for item in items]),
+        since=T0,
+        max_cycles=1,
+    )
+
+    assert client.tokens == ["", "page-2"]
+    assert batches == [["newest", "deep"]]
+    assert since == T0 + 30
