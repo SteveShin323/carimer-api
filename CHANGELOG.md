@@ -3,6 +3,18 @@
 This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- The live health check no longer skips the two Shops checks on most runs. The default
+  query is dominated by individual listings, so `shops_detail` and `shops_storefront`
+  usually reported `skipped` and the 0.2.0 storefront code went unexercised by the cron.
+  When the first page holds no Shops item the check now spends one extra Shops-only
+  search (`itemTypes=[ITEM_TYPE_BEYOND]`) to find a target; a failure of that search
+  still reports `skipped`, but a block or rate limit is re-raised. A full run is now
+  19-23 calls.
+
 ## [0.2.0] — 2026-09-03
 
 A survey of what `jp.mercari.com` does anonymously turned up three endpoint families the

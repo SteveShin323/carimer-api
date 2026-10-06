@@ -13,7 +13,7 @@ failure. Otherwise one Mercari sidebar change turns the cron permanently red.
 Usage:
     python scripts/health_check.py [--json out.json] [--markdown] [--quiet]
 
-Calls: 19-22.
+Calls: 19-23 (the extra one is a Shops-only search, spent only when the first page has no Shops item).
 """
 
 from __future__ import annotations
@@ -41,6 +41,7 @@ from carimer.transport.errors import BlockedError, RateLimitedError
 
 REQUIRED_SECTIONS = {"category_id", "brand_id", "status", "item_condition_id", "price"}
 BASE_QUERY = SearchQuery("iphone 15").price(10_000, 80_000)
+_NO_SHOPS = "no Shops item on the first page or in a Shops-only search"
 
 #: A 32x32 JPEG, just enough to exercise `entities:imageSearch`. Results are irrelevant;
 #: the check is that the endpoint still accepts an upload and returns an `image.id`.
@@ -72,6 +73,8 @@ class HealthCheck:
     def __init__(self, client: Client) -> None:
         self.client = client
         self.checks: list[Check] = []
+        self._shops_page: Any = None
+        self._shops_page_fetched = False
 
     def run(self) -> list[Check]:
         page = self._search()
@@ -79,14 +82,15 @@ class HealthCheck:
         self._profile(page)
         self._sections()
         self._colors()
-        self._shops_detail(page)
+        shops_page = self._find_shops_page(page)
+        self._shops_detail(shops_page)
         self._auction_parsing()
         self._regular_listing_filter()
         self._created_after_offset()
         self._badges(page)
         self._desired_price(page)
         self._image_search()
-        self._storefront(page)
+        self._storefront(shops_page)
         self._related_component(page)
         return self.checks
 
@@ -200,13 +204,35 @@ class HealthCheck:
         except Exception as exc:
             check.status, check.detail = "fail", _describe(exc)
 
+    def _find_shops_page(self, page: Any) -> Any:
+        """A page with at least one Shops item, or ``None`` if the live data has none.
+
+        The default query is dominated by individual listings, so on most runs the first
+        page holds no Shops item and the two Shops checks used to report ``skipped`` --
+        which left the 0.2.0 storefront code unexercised by the cron. Falls back to one
+        Shops-only search (``itemTypes=[ITEM_TYPE_BEYOND]``) when, and only when, the
+        first page has no Shops item. A failure here is not a check of its own: the
+        Shops checks then report ``skipped`` with the reason in ``detail``.
+        """
+        if page is not None and any(i.kind is ItemKind.SHOPS for i in page.items):
+            return page
+        if not self._shops_page_fetched:
+            self._shops_page_fetched = True
+            try:
+                self._shops_page = self.client.search(BASE_QUERY.item_types(ItemType.BEYOND), page_size=20)
+            except (BlockedError, RateLimitedError):
+                raise
+            except Exception:  # the Shops checks report their own skip
+                self._shops_page = None
+        return self._shops_page
+
     def _shops_detail(self, page: Any) -> None:
         check = Check("shops_detail", required=False)
         self.checks.append(check)
         try:
-            item = next((i for i in page.items if i.kind is ItemKind.SHOPS), None)
+            item = next((i for i in page.items if i.kind is ItemKind.SHOPS), None) if page else None
             if item is None:
-                check.status, check.detail = "skipped", "no Shops item on the first page"
+                check.status, check.detail = "skipped", _NO_SHOPS
                 return
             product = self.client.get_shops_product(item.id)
             check.status = "pass" if product.display_name else "fail"
@@ -283,12 +309,10 @@ class HealthCheck:
         check = Check("shops_storefront", required=False)
         self.checks.append(check)
         try:
-            shop_id = next(
-                (i.shop.id for i in page.items if i.shop and i.shop.id),
-                None,
-            )
+            items = page.items if page else []
+            shop_id = next((i.shop.id for i in items if i.shop and i.shop.id), None)
             if shop_id is None:
-                check.status, check.detail = "skipped", "no Shops item on the first page"
+                check.status, check.detail = "skipped", _NO_SHOPS
                 return
             detail = self.client.shops.details(shop_id)
             products, token = self.client.shops.products(shop_id, page_size=5)
